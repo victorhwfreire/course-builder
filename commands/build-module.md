@@ -11,7 +11,7 @@ You are the orchestrator of the `course-builder` plugin. The human invoked `/cou
 
 - **Spec path:** `$ARGUMENTS` (the path the human passed, e.g. `examples/module-spec.ia-devs-mod3.yaml`). If `$ARGUMENTS` is empty, stop and ask the human for a spec path.
 - **Output dir:** `out/<modulo>/` (derive `<modulo>` in Phase 0).
-- **Baseline path (default, for the dogfood spec only):** `C:\Users\vhwf\Documents\Claude\Projects\IA Para Devs\Mod3-IH-261\` — the known-good Module 3 artifacts (real ementa, repo, etc.) used by `qa-reviewer` for drift measurement. Accept an override: if the human supplies a different baseline, use it instead.
+- **Baseline path (optional):** the path to known-good module artifacts (the real ementa, repo, etc.) used by `qa-reviewer` for drift measurement. The human supplies it, or omits it — there is **no built-in default**, because the baseline lives wherever the reference module happens to be on that machine. If omitted, `qa-reviewer` skips drift-vs-baseline and records a note in `qa-report.md` (every other check still runs).
 
 ## Dispatch mechanics (applies to every phase)
 
@@ -77,7 +77,7 @@ Report per dispatch: artifact(s) produced; note any re-dispatch.
 
 ## Phase 4 — QA  (Gate HITL #2)
 
-14. **Dispatch `qa-reviewer`** with the spec path + output dir + **baseline path**. Use the default baseline `C:\Users\vhwf\Documents\Claude\Projects\IA Para Devs\Mod3-IH-261\` for the dogfood spec (`examples/module-spec.ia-devs-mod3.yaml`); use the human-supplied baseline if one was given. `qa-reviewer` re-verifies planted bugs against the pinned `ferramenta_base.versao`, measures drift vs the baseline (dogfood-as-eval: drift from the Module 3 baseline = a **plugin regression**, not just a module difference), runs coherence checks, and produces `out/<modulo>/qa-report.md` with a verdict (SHIPPABLE / NÃO-SHIPPABLE / SHIPPABLE-COM-RESERVAS) and findings by severity.
+14. **Dispatch `qa-reviewer`** with the spec path + output dir + **baseline path** (only if the human supplied one). If no baseline was given, dispatch `qa-reviewer` without one — it skips drift-vs-baseline and records a note. `qa-reviewer` re-verifies planted bugs against the pinned `ferramenta_base.versao`, measures drift vs the baseline when provided (dogfood-as-eval: drift from a known-good baseline = a **plugin regression**, not just a module difference), runs coherence checks, and produces `out/<modulo>/qa-report.md` with a verdict (SHIPPABLE / NÃO-SHIPPABLE / SHIPPABLE-COM-RESERVAS) and findings by severity.
 15. **Gate HITL #2 (hard pause):** after `qa-reviewer` returns, **STOP**. Surface `qa-report.md` to the human — the verdict, the blocker/warning/note counts, and the drift section. **Do NOT auto-ship.** Do NOT declare the module shipped. Do NOT commit. Per `spec.filosofia.hitl_so_grave`, shipping a wrong module to students is a **grave and irreversible** path — HITL is justified here even though the rest of the pipeline is automated. The module is only "shipped" once a human reads the report and gives explicit greenlight.
 
 Report: `qa-report.md` produced; verdict + counts surfaced; orchestrator paused for human greenlight.
@@ -99,7 +99,7 @@ If the human reviews `qa-report.md` and says to ship:
 /course-builder:build-module examples/module-spec.ia-devs-mod3.yaml
 ```
 
-This dogfoods the plugin: the example spec recreates Module 3 of "IA para Devs" (CESAR 2026), so the generated bundle is compared against the real Module 3 baseline at `C:\Users\vhwf\Documents\Claude\Projects\IA Para Devs\Mod3-IH-261\` during Phase 4.
+This dogfoods the plugin: the example spec recreates Module 3 of "IA para Devs" (CESAR 2026). If you have the real Module 3 artifacts locally, pass that directory as the baseline so `qa-reviewer` can measure drift during Phase 4; otherwise drift-vs-baseline is skipped (all other checks still run).
 
 ---
 

@@ -16,7 +16,7 @@ This is a local plugin. The manifest at `.claude-plugin/plugin.json` declares me
 **Fastest (dev/test, current session only):**
 
 ```powershell
-claude --plugin-dir "C:\Users\vhwf\Documents\Claude\Projects\ia-devs-course-builder"
+claude --plugin-dir .
 ```
 
 **Persistent (local marketplace):** create a `.claude-plugin/marketplace.json` in a parent catalog dir listing this plugin, then:
@@ -29,7 +29,7 @@ claude --plugin-dir "C:\Users\vhwf\Documents\Claude\Projects\ia-devs-course-buil
 Verify after install:
 
 ```powershell
-claude plugin validate "C:\Users\vhwf\Documents\Claude\Projects\ia-devs-course-builder"
+claude plugin validate .
 ```
 
 ## Run
