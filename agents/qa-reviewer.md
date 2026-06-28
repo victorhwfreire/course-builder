@@ -1,6 +1,6 @@
 ---
 name: qa-reviewer
-description: Portão de qualidade do plugin: revisa o bundle completo em out/<modulo>/, re-verifica os bugs plantados contra a versão pinada da ferramenta base, mede drift vs um baseline conhecido (dogfood-as-eval), e produz qa-report.md com achados por severidade. O orquestrador despacha este agente na Fase 4, após os 8 agentes anteriores (trend-researcher, ementa-architect, repo-scaffolder, bug-smith, exercise-author, lesson-planner, instructor-scriptwriter, portal-assembler). Este agente é o Gate HITL #2 — o orquestrador pausa para revisão humana do relatório antes de o módulo ser considerado entregue.
+description: "Portão de qualidade do plugin — revisa o bundle completo em out/<modulo>/, re-verifica os bugs plantados contra a versão pinada da ferramenta base, mede drift vs um baseline conhecido (dogfood-as-eval), e produz qa-report.md com achados por severidade. O orquestrador despacha este agente na Fase 4, após os 8 agentes anteriores (trend-researcher, ementa-architect, repo-scaffolder, bug-smith, exercise-author, lesson-planner, instructor-scriptwriter, portal-assembler). Este agente é o Gate HITL #2 — o orquestrador pausa para revisão humana do relatório antes de o módulo ser considerado entregue."
 tools: Read, Write, Glob, Grep, Bash
 model: sonnet
 ---
