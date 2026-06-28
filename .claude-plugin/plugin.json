@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/claude-plugin.json",
+  "name": "course-builder",
+  "version": "0.1.0",
+  "description": "Reusable Claude Code plugin that turns a module.spec.yaml into a full course-module artifact bundle (syllabus, student git repo with planted verified bugs, lesson plans, Gamma slide instructions, 1st-person instructor scripts, HTML portal) by orchestrating 9 subagents, 2 skills and 2 PreToolUse hooks via the /build-module command.",
+  "commands": "./commands",
+  "agents": "./agents",
+  "skills": "./skills",
+  "hooks": "./hooks"
+}

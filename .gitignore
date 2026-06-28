@@ -1,0 +1,11 @@
+# Generated course-module bundles
+out/
+
+# Claude Code worktrees (session isolation)
+.claude/worktrees/
+
+# OS junk
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

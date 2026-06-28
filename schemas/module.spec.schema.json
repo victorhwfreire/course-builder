@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://course-builder.local/schemas/module.spec.schema.json",
+  "title": "Course Module Spec",
+  "description": "Input spec consumed by the /build-module command of the course-builder plugin. Describes one course module and drives the 9 subagents + 2 skills + 2 hooks that produce the artifact bundle.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["curso", "publico_alvo", "aulas"],
+  "properties": {
+    "curso": {
+      "type": "object",
+      "description": "The course this module belongs to.",
+      "additionalProperties": false,
+      "required": ["nome"],
+      "properties": {
+        "nome": {
+          "type": "string",
+          "description": "Course name (e.g. 'IA para Devs').",
+          "minLength": 1
+        },
+        "codigo": {
+          "type": "string",
+          "description": "Optional internal course code (e.g. 'IH-261').",
+          "minLength": 1
+        }
+      }
+    },
+    "publico_alvo": {
+      "type": "string",
+      "description": "Target audience profile. Free-text, but should be specific enough to drive tone/depth of generated artifacts.",
+      "minLength": 1
+    },
+    "aulas": {
+      "type": "array",
+      "description": "Ordered list of lessons in this module. At least one is required.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["numero", "titulo", "topicos"],
+        "properties": {
+          "numero": {
+            "type": "integer",
+            "description": "1-based lesson number within the module.",
+            "minimum": 1
+          },
+          "titulo": {
+            "type": "string",
+            "description": "Lesson title.",
+            "minLength": 1
+          },
+          "topicos": {
+            "type": "array",
+            "description": "Concrete topics the lesson covers. Drives lesson-plan, slides and script generation. Non-empty.",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "duracao_min": {
+            "type": "integer",
+            "description": "Optional lesson duration in minutes. Omit if the module default applies.",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "ferramenta_base": {
+      "type": "object",
+      "description": "Base AI tool the module teaches. Pinned version is consumed by bug-smith/qa-reviewer to mitigate tool-rot.",
+      "additionalProperties": false,
+      "required": ["versao"],
+      "properties": {
+        "nome": {
+          "type": "string",
+          "description": "Tool name. Defaults to 'Claude Code'.",
+          "minLength": 1,
+          "default": "Claude Code"
+        },
+        "versao": {
+          "type": "string",
+          "description": "Concrete version floor (e.g. '2.1'). Used to scope generated examples and bug-smith behavior.",
+          "minLength": 1
+        }
+      }
+    },
+    "filosofia": {
+      "type": "object",
+      "description": "Pedagogical contract for the module. Both flags default to true.",
+      "additionalProperties": false,
+      "properties": {
+        "artifact_first": {
+          "type": "boolean",
+          "description": "Every interaction ends in a versionable artifact, never chatbot Q&A.",
+          "default": true
+        },
+        "hitl_so_grave": {
+          "type": "boolean",
+          "description": "Human-in-the-loop only on grave/risky paths; automate the safe path.",
+          "default": true
+        }
+      }
+    },
+    "branding": {
+      "type": "object",
+      "description": "Visual/organizational identity for generated artifacts. Optional; when omitted, the orchestrator derives org from curso.nome and uses a default accent color.",
+      "additionalProperties": false,
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "Organization name shown on artifacts (e.g. 'CESAR').",
+          "minLength": 1
+        },
+        "cor_acento": {
+          "type": "string",
+          "description": "Hex accent color used in HTML portal and slides.",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
+      }
+    },
+    "pesquisar_tendencias": {
+      "type": "boolean",
+      "description": "Whether the trend-researcher subagent runs. Defaults to true. Set false to skip web research (e.g. offline runs, rate-limited environment).",
+      "default": true
+    }
+  }
+}

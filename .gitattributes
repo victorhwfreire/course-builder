@@ -1,0 +1,3 @@
+# Force LF line endings on text files that must stay POSIX-friendly
+*.sh text eol=lf
+*.md text eol=lf

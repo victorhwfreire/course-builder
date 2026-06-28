@@ -1,0 +1,81 @@
+# Example module.spec.yaml for the course-builder plugin.
+# Dogfoods Module 3 of the "IA para Devs" course (CESAR 2026) — the same module
+# the plugin was built to teach. Use this as a fixture: it must validate against
+# schemas/module.spec.schema.json with zero errors.
+#
+# Run:  claude /build-module examples/module-spec.ia-devs-mod3.yaml
+
+curso:
+  nome: "IA para Devs"
+  codigo: "IH-261"
+
+publico_alvo: >-
+  Engenheiros, QAs e tech leads do CESAR — perfil técnico, já exposto a IA em
+  algum nível e vindo dos Módulos 1 e 2 (prompting técnico e codificação
+  assistida com Gemini + VS Code).
+
+# 4 aulas de 3h (180 min) cada — Terças e quintas, 19h–22h.
+aulas:
+  - numero: 1
+    titulo: "Code review, smells e qualidade com IA"
+    topicos:
+      - "Workflow de code review multiagente (enxame paralelo) no Claude Code"
+      - "Subagents especializados: code-reviewer, smell-detector, security-reviewer"
+      - "Slash command /review com fan-out e consolidação em relatório"
+      - "Code smells como categorias verificáveis (duplicação, funções longas, acoplamento, código morto)"
+      - "Gate de severidade: HITL só em achados high/critical"
+      - "Checklist de segurança e privacidade do módulo"
+      - "Tendência 2026: enxames de subagents paralelos > revisão única"
+    duracao_min: 180
+
+  - numero: 2
+    titulo: "Código legado, debugging e entendimento de sistemas"
+    topicos:
+      - "Agente como investigador autônomo de sistemas desconhecidos/legados"
+      - "Subagent system-mapper: lê a base e produz system-map.md (com diagrama Mermaid)"
+      - "Workflow /debug: reproduz, isola e diagnostica um bug → root-cause.md"
+      - "Testes de caracterização: fotografam o comportamento atual antes de refatorar"
+      - "Tratar o agente como dev júnior: instruções claras + guardrails"
+      - "HITL em mudança de comportamento de legado; modo plan para investigação read-only"
+      - "Tendência 2026: agente autônomo forte em migração de legado e regressões sutis"
+    duracao_min: 180
+
+  - numero: 3
+    titulo: "Instruções persistentes e workflows com Claude"
+    topicos:
+      - "Curadoria de CLAUDE.md enxuto (< ~150–200 linhas) — menos é mais"
+      - "Progressive disclosure: detalhe em arquivos referenciados, core minimal"
+      - "AGENTS.md interoperável (comandos de build/test, convenções, limites)"
+      - "Encapsular workflows recorrentes em slash commands (/pr-ready, /fix-and-test)"
+      - "Hooks PostToolUse (formatar/lintar) e PreToolUse (bloquear ação destrutiva)"
+      - "Anti-padrão: acumular regra a cada erro; curadoria humana > geração automática"
+      - "HITL codificado como regra do projeto, não memória do dev"
+    duracao_min: 180
+
+  - numero: 4
+    titulo: "Agents, skills, plugins e MCPs no workflow do dev"
+    topicos:
+      - "Mental model: skill = receita, MCP = encanamento, subagent = especialista, plugin = cozinha completa"
+      - "Construir uma skill (.claude/skills/<nome>/SKILL.md + scripts)"
+      - "Configurar um MCP server (GitHub ou filesystem) e usar num workflow"
+      - "Empacotar agents/commands/skills/hooks das aulas 1–3 em um plugin instalável"
+      - "Matriz de decisão: quando usar cada recurso para tarefas reais"
+      - "Superfície de ataque de plugins/MCP de terceiros; HITL em MCP com escrita"
+      - "Projeto integrador: Dev Workflow Plugin do aluno, pronto para o time"
+    duracao_min: 180
+
+ferramenta_base:
+  nome: "Claude Code"
+  # Pinned version floor — consumed by bug-smith and qa-reviewer to mitigate
+  # tool-rot (e.g. subagent frontmatter shape, hook event names).
+  versao: "2.1"
+
+filosofia:
+  artifact_first: true
+  hitl_so_grave: true
+
+branding:
+  org: "CESAR"
+  cor_acento: "#e2231a"
+
+pesquisar_tendencias: true
