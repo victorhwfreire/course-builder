@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash hooks/scripts/block-destructive-git.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/block-destructive-git.sh\""
           }
         ]
       },
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash hooks/scripts/block-real-secret-prefixes.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/block-real-secret-prefixes.sh\""
           }
         ]
       }

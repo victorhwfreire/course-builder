@@ -3,9 +3,9 @@ description: Orchestrate the 9 course-builder subagents through 4 phases (spec-p
 argument-hint: [path/to/module.spec.yaml]
 ---
 
-# /build-module — course-builder orchestrator
+# /course-builder:build-module — course-builder orchestrator
 
-You are the orchestrator of the `course-builder` plugin. The human invoked `/build-module <spec-path>` with `$ARGUMENTS`. Follow the phases below in order. **Command directs, Agent decides, Skill executes**: you dispatch subagents and enforce gates; you do not author artifacts yourself.
+You are the orchestrator of the `course-builder` plugin. The human invoked `/course-builder:build-module <spec-path>` with `$ARGUMENTS`. Follow the phases below in order. **Command directs, Agent decides, Skill executes**: you dispatch subagents and enforce gates; you do not author artifacts yourself.
 
 ## Inputs
 
@@ -15,7 +15,7 @@ You are the orchestrator of the `course-builder` plugin. The human invoked `/bui
 
 ## Dispatch mechanics (applies to every phase)
 
-- Dispatch each subagent via the subagent/`Task` tool, passing: **agent name** (from `agents/<name>.md`), the **spec path** (absolute), the **output dir** (absolute), and — for `qa-reviewer` only — the **baseline path**.
+- Dispatch each subagent via the subagent/`Task` tool, passing: **agent name** (from `agents/<name>.md`), the **spec path** (absolute), the **output dir** (absolute), and — for `qa-reviewer` only — the **baseline path**. **Plugin agents are namespaced:** pass the Task tool the namespaced name `course-builder:<slug>` (e.g. `course-builder:ementa-architect`, `course-builder:bug-smith`, `course-builder:qa-reviewer`), not the bare slug — plugin-shipped agents register under the plugin name and a bare-name lookup will fail.
 - One agent per dispatch. Wait for each agent to return before dispatching the next (the phases are sequential; handoffs are ordered).
 - **Agents do NOT commit.** No agent runs `git`. Git is handled by the human (or by you, only after Gate HITL #2 greenlight and only if the human asks). This is a hard rule.
 - **Report progress per phase** to the human: which agent ran, what artifact(s) it produced, and any flags it raised. Keep the human oriented — a one-line status per dispatch is enough.
@@ -96,7 +96,7 @@ If the human reviews `qa-report.md` and says to ship:
 ## Usage example
 
 ```
-claude /build-module examples/module-spec.ia-devs-mod3.yaml
+/course-builder:build-module examples/module-spec.ia-devs-mod3.yaml
 ```
 
 This dogfoods the plugin: the example spec recreates Module 3 of "IA para Devs" (CESAR 2026), so the generated bundle is compared against the real Module 3 baseline at `C:\Users\vhwf\Documents\Claude\Projects\IA Para Devs\Mod3-IH-261\` during Phase 4.

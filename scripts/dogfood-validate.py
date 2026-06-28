@@ -158,35 +158,60 @@ for a in skill_tool_agents:
         warn(f"agent {a}: has 'Skill' in tools but references no known skill "
              f"({sorted(SKILLS_REFERENCED)}) in its body")
 
-# --- 5. Hook scripts exist + settings.json.example refs -------------------
-settings_path = ROOT / "settings.json.example"
-if settings_path.exists():
+# --- 5. Hook scripts exist + hooks/hooks.json refs ------------------------
+hooks_json = ROOT / "hooks" / "hooks.json"
+if not hooks_json.exists():
+    fail("hooks/hooks.json missing (plugin hooks must live here, auto-discovered)")
+else:
     try:
-        settings = json.loads(settings_path.read_text(encoding="utf-8"))
+        hj = json.loads(hooks_json.read_text(encoding="utf-8"))
     except Exception as e:
-        fail(f"settings.json.example: not valid JSON — {e}")
-        settings = {}
-    # collect referenced script paths
+        fail(f"hooks/hooks.json: not valid JSON — {e}")
+        hj = {}
+    raw = hooks_json.read_text(encoding="utf-8")
+    # every hook command should reference ${CLAUDE_PLUGIN_ROOT} (portable)
+    if "${CLAUDE_PLUGIN_ROOT}" not in raw:
+        warn("hooks/hooks.json: no ${CLAUDE_PLUGIN_ROOT} reference — "
+             "script paths won't resolve when plugin is installed from cache")
     refs = set()
-    raw = settings_path.read_text(encoding="utf-8")
     for m in re.finditer(r"hooks/scripts/[\w.-]+\.sh", raw):
         refs.add(m.group(0))
     for r in sorted(refs):
         p = ROOT / r
         if not p.exists():
-            fail(f"hook script referenced in settings.json.example not found: {r}")
+            fail(f"hook script referenced in hooks/hooks.json not found: {r}")
         else:
             print(f"[OK] hook script exists: {r}")
-else:
-    fail("settings.json.example missing")
+    print("[OK] hooks/hooks.json present (plugin hook config, auto-discovered)")
+
+# a stale settings.json.example would mislead users into merging hooks manually
+stale = ROOT / "settings.json.example"
+if stale.exists():
+    warn("settings.json.example present — now redundant since hooks live in "
+         "hooks/hooks.json; consider removing it")
 
 # --- plugin.json sanity ---------------------------------------------------
+# Components in commands/, agents/, skills/, hooks/hooks.json are auto-discovered
+# and should NOT be declared as directory-path strings (that fails
+# `claude plugin validate`: agents/commands want arrays, hooks wants a .json
+# path or inline object). We accept a clean manifest with just metadata.
 pj = ROOT / ".claude-plugin" / "plugin.json"
 try:
     plugin = json.loads(pj.read_text(encoding="utf-8"))
-    for key in ("commands", "agents", "skills", "hooks"):
-        if key not in plugin:
-            warn(f"plugin.json: missing '{key}' pointer")
+    if not plugin.get("name"):
+        fail("plugin.json: missing required 'name'")
+    # agents/commands as a bare directory string is the validate-error shape
+    for key in ("agents", "commands"):
+        v = plugin.get(key)
+        if isinstance(v, str):
+            fail(f"plugin.json: '{key}' is a string — must be an array of "
+                 f"paths, or omitted for auto-discovery (claude plugin validate "
+                 f"rejects this)")
+    hv = plugin.get("hooks")
+    if isinstance(hv, str) and hv.rstrip("/").endswith("hooks"):
+        fail(f"plugin.json: 'hooks' points at a directory ({hv!r}) — must be a "
+             f"path to a hooks .json file or an inline object; omit for "
+             f"auto-discovery of hooks/hooks.json")
     print(f"[OK] plugin.json valid (name={plugin.get('name')}, "
           f"version={plugin.get('version')})")
 except Exception as e:
