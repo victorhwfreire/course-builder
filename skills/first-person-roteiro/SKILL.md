@@ -79,3 +79,15 @@ Run these checks against the HTML you produced. If any fails, fix and re-check �
 5. **Stage directions are bracketed bold.** Every `<b>[...]` opener in Partes 2 and 3 marks a physical action; verify the bracket is present and the text inside is a stage direction, not a spoken line.
 
 A roteiro fragment like `"<p>Abra o terminal e rode /review app-exemplo/.</p>"` **must** be caught by check 3 and rewritten to, e.g., `"<p>Vou abrir o terminal aqui e rodar /review app-exemplo/ pra vocês verem o enxame trabalhando.</p>"`.
+
+## 5. Mode `estudo-dirigido`: the professor guide
+
+In this mode the speech is data, not HTML: `preparacao/professor/fala_<id>.py` (contract in the skill `aula-fonte-unica`), rendered by `construir_professor.py` into `guia-professor.html`. The voice contract above still holds, with these adaptations:
+
+- **3 to 5 spoken paragraphs per slide** (`FALAS[n]["fala"]`): opening and transitions 3; dense concepts 5. Each slide links to the previous one aloud when the concepts form a chain.
+- **Stage directions** go inline in square brackets, without bold: `[Rodar o workflow nos três tickets.]`. The generator greys them out; text inside backticks stays code.
+- **Bastidor** is the optional `FALAS[n]["bastidor"]` field, never spoken; there is no `.diga`: the anchor phrase comes from the lesson source (`SLIDES[n]["ancora"]`).
+- **Describe the screen** for whoever follows by audio or interpretation ("a caixa tracejada é o modelo; a verde é o controle").
+- **At least one concrete example per content slide**, from the case and, for dense concepts, a real researched one with author, venue and year in `REFS`. A study's number comes with its limit (models, tasks, date) in `NOTA`.
+- **Demonstration acts** (`ATOS`): each step has `fazer`, the exact `cmds` copied from `PARTE2`, what appears `tela`, what to `dizer` (one short quoted line) and `senao` (what to do if it fails). When the real runs showed the model may behave in two ways, the speech covers both and says which one is guaranteed by a check that does not depend on the model.
+- The expository format means no question to the class is required for the lesson to move on; questions in the chat are welcome but optional.

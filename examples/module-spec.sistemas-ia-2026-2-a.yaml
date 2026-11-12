@@ -1,0 +1,169 @@
+# Spec de exemplo do modo estudo-dirigido.
+# Descreve as seis aulas de M3 e M4 da turma 2026.2-A de Sistemas com IA para Devs
+# (CESAR School, 11 a 30/11/2026), produzidas com o método da skill aula-fonte-unica.
+# Os artefatos reais dessa turma servem de baseline para o qa-reviewer.
+#
+# Rodar:  /course-builder:build-module examples/module-spec.sistemas-ia-2026-2-a.yaml
+
+curso:
+  nome: "Sistemas com IA para Devs"
+  codigo: "2026.2-A"
+
+publico_alvo: >-
+  Desenvolvedores em especialização na CESAR School, com Python básico e terminal,
+  vindos de M1 (tipos de solução com LLM) e M2 (RAG). Turma on-line e pouco
+  participativa em M1 e M2: aula expositiva, profundidade média, termos simples e
+  prática passo a passo no estudo dirigido.
+
+tipo_avaliacao: estudo-dirigido
+
+turma:
+  codigo: "2026.2-A"
+  docente: "Victor Freire"
+  inicio: "19:00"
+  intervalo: { inicio: "20:10", fim: "20:25" }
+  monitor: { inicio: "21:15", fim: "21:35" }
+  repositorio: "https://github.com/victorhwfreire/sistemas_ia_devs_b2c_20262"
+  canal: "canal da turma"
+
+caso:
+  nome: "Balcão"
+  pasta: "caso-balcao"
+  descricao: >-
+    Plataforma fictícia de pagamentos para pequenos comércios (maquininha, link de
+    pagamento e API). O suporte recebe tickets em texto livre e precisa classificar,
+    investigar nos dados, agir e responder; cada aula olha para um pedaço desse fluxo.
+  componentes:
+    - "12 tickets com gabarito de categoria, prioridade e time"
+    - "dados fictícios de clientes, cobranças e política de atendimento"
+    - "workflow de triagem em três passos"
+    - "script que roda o agente no Claude Code em modo -p e grava o registro"
+    - "leitor de registro sem chamada ao modelo (passos, ferramentas, tempo, tokens, custo)"
+    - "servidor MCP com contrato fraco e forte e estorno simulado"
+    - "hook PreToolUse que registra cada chamada e aplica a política de estorno"
+    - "eval da triagem com repetições, pass@k e pass^k"
+
+# Em 2026.2-A as ementas eram ../M3.md e ../M4.md, fora da pasta da turma. Num módulo novo,
+# liste aqui (caminhos relativos à saída) as ementas que já existem; sem o campo, o
+# ementa-architect escreve ementa.md.
+
+execucoes_reais: true
+
+aulas:
+  - modulo: "M3"
+    modulo_nome: "M3 · Workflows, agentes, tool use e MCPs"
+    numero: 1
+    titulo: "Workflow ou agente: quem decide o próximo passo"
+    data: "2026-11-11"
+    pergunta: "quando vale dar autonomia ao modelo?"
+    duracao_min: 180
+    topicos:
+      - "No workflow, o código decide o caminho"
+      - "No agente, o modelo escolhe o próximo passo"
+      - "Cada passo a mais é uma chance a mais de errar"
+      - "Todo agente precisa de uma política de parada"
+      - "Comece pelo workflow; suba para agente com motivo"
+    monitor:
+      topico: "O caso Balcão em LangGraph: workflow e agente como grafo de estados"
+      alternativa: "Os cinco padrões de workflow da Anthropic com exemplos de mercado"
+
+  - modulo: "M3"
+    modulo_nome: "M3 · Workflows, agentes, tool use e MCPs"
+    numero: 2
+    titulo: "Tool use: o modelo pede, o seu código executa"
+    data: "2026-11-16"
+    pergunta: "o que faz uma ferramenta ser boa para um modelo?"
+    duracao_min: 180
+    topicos:
+      - "Para o modelo, a ferramenta é só o texto que a descreve"
+      - "O modelo pede a ferramenta; quem executa é o seu código"
+      - "O esquema orienta; a validação no código garante"
+      - "O erro precisa ensinar, e o risco precisa estar escrito"
+      - "Escreva a ferramenta para um colega que chegou hoje"
+    monitor:
+      topico: "Function calling na API: o mesmo contrato na Anthropic, na OpenAI e no Gemini"
+      alternativa: "Saída estruturada ou tool use: quando pedir JSON e quando pedir ação"
+
+  - modulo: "M3"
+    modulo_nome: "M3 · Workflows, agentes, tool use e MCPs"
+    numero: 3
+    titulo: "MCP: plugar ferramentas sem perder o controle"
+    data: "2026-11-18"
+    pergunta: "como dar ferramentas ao agente sem perder o controle?"
+    duracao_min: 180
+    topicos:
+      - "MCP padroniza a tomada entre agente e sistema"
+      - "Servidor local roda como você; remoto pede autenticação"
+      - "Quem pluga um servidor herda o risco dele"
+      - "O limite mora fora do modelo: permissão e hook"
+      - "Toda integração nasce com ferramenta, limite e registro"
+    monitor:
+      topico: "Escolher um servidor MCP de terceiro: checklist de cadeia de suprimentos com três servidores populares"
+      alternativa: "O mesmo servidor MCP no VS Code, no Cursor e no Claude Desktop"
+
+  - modulo: "M4"
+    modulo_nome: "M4 · Evals, logs e guardrails na prática"
+    numero: 1
+    titulo: "Evals: sem medir, não dá para dizer que melhorou"
+    data: "2026-11-23"
+    pergunta: "como eu sei que a mudança melhorou?"
+    duracao_min: 180
+    topicos:
+      - "“Parece que funciona” é uma amostra de um"
+      - "O eval só enxerga o que está nos casos"
+      - "Quanto mais flexível a nota, mais cara e menos confiável"
+      - "Uma rodada não basta: o acerto varia e a amostra engana"
+      - "Eval é o teste de regressão do comportamento"
+    monitor:
+      topico: "Ferramentas de eval na prática: o caso Balcão no promptfoo"
+      alternativa: "Modelo como juiz: escrever a rubrica e calibrar contra uma pessoa"
+
+  - modulo: "M4"
+    modulo_nome: "M4 · Evals, logs e guardrails na prática"
+    numero: 2
+    titulo: "Logs e custo: explicar o que aconteceu e quanto custou"
+    data: "2026-11-25"
+    pergunta: "quando a resposta sai errada, consigo explicar por quê e quanto custou?"
+    duracao_min: 180
+    topicos:
+      - "Cada campo do log responde a uma pergunta de incidente"
+      - "Trace: a árvore de passos ligados por um id"
+      - "Custo que decide é por sucesso, não por chamada"
+      - "Latência se lê em percentil, e o agente soma voltas"
+      - "O que não é medido não é gerenciado"
+    monitor:
+      topico: "Observabilidade de LLM com OpenTelemetry: a telemetria do Claude Code e um painel no Langfuse"
+      alternativa: "Cache de prompt: como o cache muda custo e latência"
+
+  - modulo: "M4"
+    modulo_nome: "M4 · Evals, logs e guardrails na prática"
+    numero: 3
+    titulo: "Guardrails: o controle não pode depender do modelo"
+    data: "2026-11-30"
+    pergunta: "o que falta para isso ir para produção?"
+    duracao_min: 180
+    topicos:
+      - "Guardrail é controle fora do modelo"
+      - "Na injeção de prompt, o dado vira instrução"
+      - "A autorização mora na ferramenta, não no prompt"
+      - "Falhar bem é cair num estado seguro, com registro"
+      - "Cada degrau até a produção pede evidência"
+    monitor:
+      topico: "OWASP Top 10 para aplicações com LLM: os dez riscos e onde cada um aparece no Balcão"
+      alternativa: "Red teaming com promptfoo"
+
+ferramenta_base:
+  nome: "Claude Code"
+  # Piso de versão. A turma 2026.2-A não registrou a versão usada: confira com
+  # `claude --version` antes de gerar e atualize este campo.
+  versao: "2.1"
+
+filosofia:
+  artifact_first: true
+  hitl_so_grave: true
+
+branding:
+  org: "CESAR School"
+  cor_acento: "#FF6002"
+
+pesquisar_tendencias: false

@@ -2,12 +2,13 @@
 """Structural dogfood validation for the course-builder plugin.
 
 Checks (no live agent dispatch):
-  1. Example spec validates against schemas/module.spec.schema.json.
+  1. Every examples/module-spec.*.yaml validates against schemas/module.spec.schema.json.
   2. Every agents/*.md has valid YAML frontmatter with name, description, tools.
-  3. commands/build-module.md references all 9 agent names and no phantom ones.
-  4. Skill names referenced by agents (cesar-html-style, first-person-roteiro)
-     resolve to skills/<name>/SKILL.md.
-  5. Hook scripts referenced by settings.json.example exist.
+  3. commands/build-module.md references every expected agent name.
+  4. Skill names referenced by agents resolve to skills/<name>/SKILL.md.
+  5. Hook scripts referenced by hooks/hooks.json exist.
+  6. Mode estudo-dirigido: the generator kit and examples in assets/ compile, and
+     scripts/scaffold_preparacao.py turns the 2026.2-A example spec into a turma.py.
 
 Exit code 0 = all checks pass, !=0 = failures found.
 """
@@ -31,22 +32,26 @@ except ImportError as e:
 
 if yaml:
     schema_path = ROOT / "schemas" / "module.spec.schema.json"
-    spec_path = ROOT / "examples" / "module-spec.ia-devs-mod3.yaml"
-    try:
-        schema = json.loads(schema_path.read_text(encoding="utf-8"))
-        spec = yaml.safe_load(spec_path.read_text(encoding="utf-8"))
-        jsonschema.Draft202012Validator(schema).validate(spec)
-        print(f"[OK] schema: example spec validates against {schema_path.name}")
-    except jsonschema.ValidationError as e:
-        fail(f"schema: example spec FAILS — {e.message} (at {list(e.absolute_path)})")
-    except Exception as e:
-        fail(f"schema: could not validate — {e}")
+    specs = sorted((ROOT / "examples").glob("module-spec.*.yaml"))
+    if not specs:
+        fail("schema: no examples/module-spec.*.yaml found")
+    for spec_path in specs:
+        try:
+            schema = json.loads(schema_path.read_text(encoding="utf-8"))
+            spec = yaml.safe_load(spec_path.read_text(encoding="utf-8"))
+            jsonschema.Draft202012Validator(schema).validate(spec)
+            print(f"[OK] schema: {spec_path.name} validates against {schema_path.name}")
+        except jsonschema.ValidationError as e:
+            fail(f"schema: {spec_path.name} FAILS — {e.message} (at {list(e.absolute_path)})")
+        except Exception as e:
+            fail(f"schema: could not validate {spec_path.name} — {e}")
 
 # --- 2. Agent frontmatter -------------------------------------------------
 EXPECTED_AGENTS = [
     "trend-researcher", "ementa-architect", "repo-scaffolder", "bug-smith",
     "exercise-author", "lesson-planner", "instructor-scriptwriter",
     "portal-assembler", "qa-reviewer",
+    "case-kit-builder", "demo-recorder", "guide-author",
 ]
 agent_dir = ROOT / "agents"
 found_agents = []
@@ -109,12 +114,12 @@ if cmd_path.exists():
     not_ref = set(EXPECTED_AGENTS) - referenced
     if not_ref:
         fail(f"command: does not reference agents: {sorted(not_ref)}")
-    print(f"[OK] command: references {len(referenced)}/9 agents")
+    print(f"[OK] command: references {len(referenced)}/{len(EXPECTED_AGENTS)} agents")
 else:
     fail("command: commands/build-module.md missing")
 
 # --- 4. Skill references resolve ------------------------------------------
-SKILLS_REFERENCED = {"cesar-html-style", "first-person-roteiro"}
+SKILLS_REFERENCED = {"cesar-html-style", "first-person-roteiro", "aula-fonte-unica"}
 for skill in SKILLS_REFERENCED:
     sk = ROOT / "skills" / skill / "SKILL.md"
     if not sk.exists():
@@ -216,6 +221,53 @@ try:
           f"version={plugin.get('version')})")
 except Exception as e:
     fail(f"plugin.json: invalid — {e}")
+
+# --- 6. Mode estudo-dirigido: generator kit, examples, scaffold -----------
+import py_compile, tempfile
+
+KIT = ROOT / "assets" / "preparacao"
+KIT_FILES = [
+    "README.md", "turma.py", "construir_aula.py", "figuras.py", "exportar_figuras.py",
+    "construir_estudo.py", "construir_monitor.py", "construir_professor.py",
+    "construir_guia_modulos.py", "construir_tudo.py", "estilo_cesar.py",
+    "copiar_para_repositorio.py", "guias/gerar_guia.py", "guias/motor.js",
+    "guias/extrair_corpo.py", "guias/registrar.py",
+]
+missing_kit = [f for f in KIT_FILES if not (KIT / f).exists()]
+if missing_kit:
+    fail(f"assets/preparacao: missing {missing_kit}")
+else:
+    print(f"[OK] assets/preparacao: {len(KIT_FILES)} generator files present")
+for py in sorted(ROOT.glob("assets/**/*.py")):
+    try:
+        py_compile.compile(str(py), doraise=True, cfile=str(Path(tempfile.gettempdir()) / "cb_dogfood.pyc"))
+    except py_compile.PyCompileError as e:
+        fail(f"{py.relative_to(ROOT)}: does not compile — {e.msg.strip().splitlines()[-1]}")
+EXEMPLO = ROOT / "assets" / "exemplo-2026-2-a"
+for f in ("aulas/m3_a1.py", "professor/fala_m3_a1.py", "guias/conteudo_m3_a1.py", "turma.py"):
+    if not (EXEMPLO / f).exists():
+        fail(f"assets/exemplo-2026-2-a/{f} missing")
+
+scaffold = ROOT / "scripts" / "scaffold_preparacao.py"
+spec_ed = ROOT / "examples" / "module-spec.sistemas-ia-2026-2-a.yaml"
+if not scaffold.exists():
+    fail("scripts/scaffold_preparacao.py missing")
+elif spec_ed.exists():
+    with tempfile.TemporaryDirectory() as tmp:
+        r = subprocess.run([sys.executable, "-B", str(scaffold), str(spec_ed), tmp],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+        turma = Path(tmp) / "preparacao" / "turma.py"
+        if r.returncode != 0 or not turma.exists():
+            fail(f"scaffold: exit {r.returncode}, turma.py {'present' if turma.exists() else 'missing'} — {r.stderr.strip()[-300:]}")
+        else:
+            ns = {}
+            exec(compile(turma.read_text(encoding="utf-8"), str(turma), "exec"), ns)
+            esperado = {"TURMA": "2026.2-A", "CASO": "Balcão", "CASO_PASTA": "caso-balcao"}
+            errado = {k: ns.get(k) for k, v in esperado.items() if ns.get(k) != v}
+            if errado:
+                fail(f"scaffold: turma.py has {errado}, expected {esperado}")
+            else:
+                print("[OK] scaffold: example spec -> preparacao/turma.py with TURMA, CASO, CASO_PASTA")
 
 # --- report ---------------------------------------------------------------
 print("\n" + "=" * 60)
