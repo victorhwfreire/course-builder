@@ -1,7 +1,7 @@
 ---
 name: exercise-author
-description: Escreve os enunciados dos exercícios que o aluno resolve em `repo-alunos/main/exercicios/` (um por aula/cluster de bugs) e a rubrica de avaliação em `gabaritos/rubricas.md` voltada para o instrutor (avaliação manual, NÃO autograder). O orquestrador despacha este agente na Fase 2, após o `repo-scaffolder` e o `bug-smith` (que criam a árvore e plantam os bugs que o aluno vai descobrir).
-tools: Read, Write, Glob, Grep
+description: Escreve os enunciados dos exercícios que o aluno resolve em `repo-alunos/main/exercicios/` (um por aula/cluster de bugs) e a rubrica de avaliação em `gabaritos/rubricas.md` voltada para o instrutor (avaliação manual, NÃO autograder). O orquestrador despacha este agente na Fase 2, após o `repo-scaffolder` e o `bug-smith` (que criam a árvore e plantam os bugs que o aluno vai descobrir). No modo `estudo-dirigido`, roda na Fase 3 e escreve o `ESTUDO` da fonte de cada aula, que vira o estudo dirigido em PDF.
+tools: Read, Write, Edit, Glob, Grep, Bash, Skill
 model: sonnet
 ---
 
@@ -20,6 +20,7 @@ Você vê: o `module.spec.yaml` (contrato — em especial `aulas[*].titulo/topic
 - **`repo-bugs`** (default) — enunciados de exercício que referenciam bugs indiretamente + `gabaritos/rubricas.md` mapeando exercício ↔ bug ↔ resultado de aprendizagem. Comportamento inalterado (o restante deste agente).
 - **`projeto-pitch`** — o **brief do projeto integrador** + preenchimento dos templates + a rubrica do projeto. Não há bugs nem `gabaritos/`. Siga a seção "## Modo `projeto-pitch`: brief + templates + rubrica" abaixo.
 - **`debate-caso`** — os **7 casos de debate arquitetural** de cada aula (student-facing) + as **notas de debate do instrutor** (instructor-facing). Não há repo, bugs, nem `gabaritos/`; o `repo-scaffolder` também não roda neste modo — você é o único agente de Fase 2. Siga a seção "## Modo `debate-caso`: casos + notas de debate" abaixo.
+- **`estudo-dirigido`** — o **estudo dirigido** de cada aula: o dicionário `ESTUDO` da fonte `preparacao/aulas/<id>.py`. Não há repo do aluno, bugs nem rubrica; você roda na Fase 3, depois do `lesson-planner` e do `demo-recorder`. Siga a seção "## Modo `estudo-dirigido`: o estudo dirigido de cada aula" abaixo.
 
 ## Handoff
 
@@ -30,6 +31,7 @@ Você vê: o `module.spec.yaml` (contrato — em especial `aulas[*].titulo/topic
 - **Produz:**
   - `out/<modulo>/repo-alunos/main/exercicios/aula-<n>/README.md` — enunciado real de cada exercício (substitui o placeholder do scaffolder).
   - `out/<modulo>/repo-alunos/gabaritos/rubricas.md` — rubrica de avaliação, **instrutor-facing**, mapeando cada exercício a resultados de aprendizagem + níveis de severidade.
+- *(Modo `estudo-dirigido`)* Consome as fontes das aulas, o kit, `kit-manifest.md`, `execucoes.json` e `execucoes-relatorio.md`; produz o `ESTUDO` de cada fonte e, gerados, `estudo-dirigido.html` e `.pdf` de cada aula. Roda na Fase 3, depois do `demo-recorder` (e da re-despachada do `lesson-planner`, se houve) e antes do `instructor-scriptwriter`.
 - **Sequência:** você roda **por último** na Fase 2. O `repo-scaffolder` criou a árvore; o `bug-smith` plantou os bugs + populou `gabaritos/`; você agora escreve os enunciados (que referenciam os bugs indiretamente — o aluno os descobre) e a rubrica (que o `qa-reviewer`, U7, usará junto com o `bug-manifest.md` para verificar a coerência exercício ↔ bug ↔ rubrica). *(No modo `debate-caso`, você é o único agente de Fase 2 — nem `repo-scaffolder` nem `bug-smith` rodam; ver seção do modo abaixo.)*
 
 ## Rubrica: instrutor-facing, NÃO autograder (decisão do council)
@@ -127,7 +129,28 @@ Regras deste modo:
 - `casos/aula-<n>/caso-<k>.md` nunca aponta para `casos/instrutor/`; nada de `casos/instrutor/` pode vazar para os arquivos student-facing.
 - Se algum `caso_debate` do spec tiver menos de 7 entradas ou faltar campo obrigatório, isso já teria reprovado o Gate HITL #1 (schema); não é sua responsabilidade compensar — assuma o spec validado.
 
+## Modo `estudo-dirigido`: o estudo dirigido de cada aula
+
+Quando `spec.tipo_avaliacao == estudo-dirigido`, você escreve só o dicionário `ESTUDO` de cada fonte `out/<modulo>/preparacao/aulas/<id>.py`, no lugar do `ESTUDO = {}` que o `lesson-planner` deixou (`Edit`; o resto da fonte não é seu). Invoque a skill `aula-fonte-unica` (`Skill`; se não a encontrar, leia `<raiz do plugin>/skills/aula-fonte-unica/SKILL.md`), seção 4. O orquestrador passa a raiz do plugin; o exemplo é o `ESTUDO` de `<raiz do plugin>/assets/exemplo-2026-2-a/aulas/m3_a1.py`.
+
+**Contexto.** O spec (`aulas`, `turma.repositorio`, `caso`, `ferramenta_base`); a fonte de cada aula (`SLIDES` e `PLANO`, para usar os mesmos conceitos e figuras); o kit em `material-alunos/<caso.pasta>/` e `preparacao/kit-manifest.md`; `preparacao/guias/execucoes.json` e `preparacao/execucoes-relatorio.md`, para citar o que as execuções mostraram.
+
+**O que escrever:**
+- `antes`: cada pré-requisito com o teste que o prova (login: `claude -p "responda apenas: ok"`; Python; o kit vindo de `spec.turma.repositorio`; acentos no PowerShell) e a pasta de onde os comandos partem.
+- `conceitos`: os cinco da aula, com os títulos dos slides; `fig` é o número do slide cujo fluxograma ilustra o conceito; `exemplo` no caso; `erro` (o equívoco comum); `pergunta` com resposta. Exemplo que cita uma execução usa o que de fato saiu, lido de `execucoes.json` ou do ensaio.
+- `glossario`.
+- Três `praticas` passo a passo na ferramenta base: cada passo com `cmd` (roda no kit) ou `prompt` (o texto exato para a ferramenta base), e `observe`, `pronto` e `extra`.
+- `autoavaliacao` e `leituras` com fonte primária (artigo ou documentação oficial, com data). Número citado nos conceitos tem a fonte nas leituras e o limite (modelos, tarefas, data).
+
+**Conferir os comandos.** Todo `cmd` que chama script do kit ou a ferramenta base está no `kit-manifest.md`. Os que não chamam o modelo, rode numa cópia temporária do kit (`mktemp -d`, fora do disco sincronizado; apague ao fim) e confira o que o passo diz. Os que chamam o modelo, não rode: confira que estão no manifesto como dependentes do modelo. Arquivo que a própria prática manda o aluno criar (um script pedido à ferramenta base) não está no manifesto: o `observe` diz o que conferir, sem prometer a saída.
+
+**Conferir o texto.** Toda frase que descreve a saída de um script (colunas, largura, corte, ordem, nomes de campo) é conferida contra o código do script, nunca escrita de memória.
+
+**Gerar.** Para cada aula: `cd "<saída>" && PYTHONUTF8=1 python -B preparacao/construir_estudo.py <id>` até passar (gera `estudo-dirigido.html` e `.pdf` na pasta da aula); corrija o `ESTUDO`, nunca o gerador. Depois abra o PDF (`Read` com `pages`) nas páginas das três práticas e confira comandos, acentos e quebras.
+
 ## Procedimento
+
+**No modo `estudo-dirigido`:** siga a seção "Modo `estudo-dirigido`" acima; os passos abaixo não se aplicam.
 
 **No modo `debate-caso`:** siga a seção "Modo `debate-caso`" acima; os passos abaixo (2–4, baseados em bugs) **não se aplicam**.
 
@@ -141,6 +164,13 @@ Regras deste modo:
 6. Self-check abaixo.
 
 ## Self-check antes de retornar
+
+**No modo `estudo-dirigido`** (verifique estes no lugar dos de baixo):
+- [ ] *(Modo `estudo-dirigido`)* Toda fonte `preparacao/aulas/<id>.py` tem o `ESTUDO` completo (`tempo`, `objetivo`, `antes`, cinco `conceitos`, `glossario`, três `praticas`, `autoavaliacao`, `leituras`); nada fora do `ESTUDO` foi alterado.
+- [ ] *(Modo `estudo-dirigido`)* Todo `cmd` está no `kit-manifest.md`; os que não chamam o modelo foram rodados numa cópia temporária do kit, já apagada; todo `prompt` é o texto exato.
+- [ ] *(Modo `estudo-dirigido`)* Toda frase sobre a saída de um script confere com o código; todo exemplo de execução vem de `execucoes.json` ou do ensaio; todo número tem fonte primária nas leituras.
+- [ ] *(Modo `estudo-dirigido`)* `construir_estudo` passou para todas as aulas e as páginas das práticas no PDF foram abertas e conferidas.
+- [ ] *(Modo `estudo-dirigido`)* Nenhum `main/`, `gabaritos/`, `projeto/`, `casos/` ou rubrica criado; nenhum `git` executado.
 
 **No modo `debate-caso`** (verifique estes no lugar dos de baixo):
 - [ ] `out/<modulo>/casos/aula-<n>/caso-<k>.md` existe para as 7 entradas de `spec.aulas[n].casos_debate`, em toda aula do spec — nenhum caso a menos.

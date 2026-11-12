@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://course-builder.local/schemas/module.spec.schema.json",
   "title": "Course Module Spec",
-  "description": "Input spec consumed by the /build-module command of the course-builder plugin. Describes one course module and drives the 9 subagents + 2 skills + 2 hooks that produce the artifact bundle. The `tipo_avaliacao` field selects the module's assessment model: 'repo-bugs' (default) drives a planted-bug coding repo; 'projeto-pitch' drives a group proposal + pitch project (Phase-2 produces a project kit and bug-smith is skipped); 'debate-caso' drives a per-lesson 4-block structure (teoria -> exemplos_basicos -> desafio_real -> debate_grupo) with 7 architectural case scenarios debated in groups per lesson — Phase 2 (repo-scaffolder and bug-smith) is skipped entirely and exercise-author writes case briefs + instructor debate notes directly under aulas/.",
+  "description": "Input spec consumed by the /build-module command of the course-builder plugin. Describes one course module and drives the 12 subagents + 3 skills + 2 hooks that produce the artifact bundle. The `tipo_avaliacao` field selects the module's assessment model: 'repo-bugs' (default) drives a planted-bug coding repo; 'projeto-pitch' drives a group proposal + pitch project (Phase-2 produces a project kit and bug-smith is skipped); 'debate-caso' drives a per-lesson 4-block structure (teoria -> exemplos_basicos -> desafio_real -> debate_grupo) with 7 architectural case scenarios debated in groups per lesson — Phase 2 (repo-scaffolder and bug-smith) is skipped entirely and exercise-author writes case briefs + instructor debate notes directly under aulas/. 'estudo-dirigido' drives expository lessons in which only the instructor demonstrates, one fictional case with an executable kit across every lesson, one single-source Python file per lesson rendered by deterministic generators, and asynchronous practice in a study guide (PDF) plus monitor and interactive guides (skill aula-fonte-unica).",
   "type": "object",
   "additionalProperties": false,
   "required": ["curso", "publico_alvo", "aulas"],
@@ -62,6 +62,36 @@
             "type": "integer",
             "description": "Optional lesson duration in minutes. Omit if the module default applies.",
             "minimum": 1
+          },
+          "modulo": {
+            "type": "string",
+            "description": "Optional module label when one spec covers several modules (e.g. 'M3'). In mode estudo-dirigido it names the lesson id (m3_a1) and folder (M3/aula-1).",
+            "minLength": 1
+          },
+          "modulo_nome": {
+            "type": "string",
+            "description": "Optional full module name shown on materials (e.g. 'M3 · Workflows, agentes, tool use e MCPs').",
+            "minLength": 1
+          },
+          "data": {
+            "type": "string",
+            "description": "Lesson date (YYYY-MM-DD). Required in mode estudo-dirigido.",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "pergunta": {
+            "type": "string",
+            "description": "The question the lesson answers, in one line. The opening states it and the closing answers it. Required in mode estudo-dirigido.",
+            "minLength": 1
+          },
+          "monitor": {
+            "type": "object",
+            "description": "Topic of the monitor's 20-minute talk in this lesson (mode estudo-dirigido).",
+            "additionalProperties": false,
+            "required": ["topico"],
+            "properties": {
+              "topico": { "type": "string", "minLength": 1 },
+              "alternativa": { "type": "string", "minLength": 1 }
+            }
           },
           "casos_debate": {
             "type": "array",
@@ -211,9 +241,67 @@
     },
     "tipo_avaliacao": {
       "type": "string",
-      "description": "Assessment model for this module, selecting the Phase-2 behavior. 'repo-bugs' (default): students fix verified planted bugs in a coding repo — Phase 2 runs repo-scaffolder -> bug-smith -> exercise-author, and qa-reviewer re-verifies the bugs. 'projeto-pitch': students deliver an executive proposal + pitch for a real problem — Phase 2 runs repo-scaffolder (project-kit mode) -> exercise-author (project-brief mode), bug-smith is SKIPPED, and qa-reviewer verifies project-kit coherence instead of planted bugs. When 'projeto-pitch', the `projeto` block is required and `ferramenta_base` is not needed. 'debate-caso': every aula follows the 4-block teoria/exemplos_basicos/desafio_real/debate_grupo structure and closes with 7 architectural case scenarios debated in groups — Phase 2 is skipped entirely (no repo-scaffolder, no bug-smith); exercise-author writes case briefs + instructor debate notes directly under aulas/aula-<n>/casos/. When 'debate-caso', `estrutura_aula` is required and every aula must have `casos_debate` with exactly 7 entries.",
-      "enum": ["repo-bugs", "projeto-pitch", "debate-caso"],
+      "description": "Assessment model for this module, selecting the Phase-2 behavior. 'repo-bugs' (default): students fix verified planted bugs in a coding repo — Phase 2 runs repo-scaffolder -> bug-smith -> exercise-author, and qa-reviewer re-verifies the bugs. 'projeto-pitch': students deliver an executive proposal + pitch for a real problem — Phase 2 runs repo-scaffolder (project-kit mode) -> exercise-author (project-brief mode), bug-smith is SKIPPED, and qa-reviewer verifies project-kit coherence instead of planted bugs. When 'projeto-pitch', the `projeto` block is required and `ferramenta_base` is not needed. 'debate-caso': every aula follows the 4-block teoria/exemplos_basicos/desafio_real/debate_grupo structure and closes with 7 architectural case scenarios debated in groups — Phase 2 is skipped entirely (no repo-scaffolder, no bug-smith); exercise-author writes case briefs + instructor debate notes directly under aulas/aula-<n>/casos/. When 'debate-caso', `estrutura_aula` is required and every aula must have `casos_debate` with exactly 7 entries. 'estudo-dirigido': expository lessons on a fixed grid (opening and map, five chained concepts, fixed break, two-act demonstration on the case, 20-minute monitor slot, discussion, closing); Phase 2 runs repo-scaffolder (generator kit + repo layout) -> case-kit-builder (executable case kit), bug-smith is SKIPPED, and Phase 3 writes one source per lesson, records real demo runs, writes the study guide, the instructor speech and the interactive guide. When 'estudo-dirigido', `turma`, `caso` and `ferramenta_base` are required and every aula needs `data` and `pergunta`.",
+      "enum": ["repo-bugs", "projeto-pitch", "debate-caso", "estudo-dirigido"],
       "default": "repo-bugs"
+    },
+    "turma": {
+      "type": "object",
+      "description": "Class logistics for mode estudo-dirigido: who teaches, when, the fixed break and monitor slots, and the public class repository.",
+      "additionalProperties": false,
+      "required": ["codigo", "docente", "inicio", "intervalo", "monitor"],
+      "properties": {
+        "codigo": { "type": "string", "description": "Class code shown on materials (e.g. '2026.2-A').", "minLength": 1 },
+        "docente": { "type": "string", "description": "Instructor name.", "minLength": 1 },
+        "inicio": { "type": "string", "description": "Lesson start time, HH:MM.", "pattern": "^\\d{2}:\\d{2}$" },
+        "intervalo": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["inicio", "fim"],
+          "properties": {
+            "inicio": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+            "fim": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" }
+          }
+        },
+        "monitor": {
+          "type": "object",
+          "description": "Fixed slot of the monitor's talk in every lesson.",
+          "additionalProperties": false,
+          "required": ["inicio", "fim"],
+          "properties": {
+            "inicio": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+            "fim": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" }
+          }
+        },
+        "repositorio": { "type": "string", "description": "Public class repository URL that receives the case kit and the study PDFs.", "minLength": 1 },
+        "canal": { "type": "string", "description": "Where the class talks (e.g. 'canal da turma no Slack').", "minLength": 1 }
+      }
+    },
+    "caso": {
+      "type": "object",
+      "description": "The fictional case that runs through every lesson in mode estudo-dirigido. case-kit-builder turns it into an executable kit under material-alunos/<pasta>/.",
+      "additionalProperties": false,
+      "required": ["nome", "descricao"],
+      "properties": {
+        "nome": { "type": "string", "description": "Case name (e.g. 'Balcão').", "minLength": 1 },
+        "descricao": { "type": "string", "description": "What the fictional organization is and what flow the lessons look at.", "minLength": 1 },
+        "pasta": { "type": "string", "description": "Kit folder under material-alunos/ (default: 'caso-' + slug of nome).", "minLength": 1 },
+        "componentes": {
+          "type": "array",
+          "description": "Optional list of kit components the lessons need (data, tools, servers, hooks, scripts).",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "ementas": {
+      "type": "array",
+      "description": "Syllabus files read by the general guide, relative to the output dir (default ['ementa.md']).",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "execucoes_reais": {
+      "type": "boolean",
+      "description": "Mode estudo-dirigido: whether demo-recorder runs the demonstrations with the base tool and records the outputs (uses the instructor's account). When false, demonstrations ship marked as not rehearsed.",
+      "default": true
     },
     "projeto": {
       "type": "object",
@@ -291,6 +379,20 @@
         "properties": {
           "aulas": {
             "items": { "required": ["casos_debate"] }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "tipo_avaliacao": { "const": "estudo-dirigido" } },
+        "required": ["tipo_avaliacao"]
+      },
+      "then": {
+        "required": ["turma", "caso", "ferramenta_base"],
+        "properties": {
+          "aulas": {
+            "items": { "required": ["data", "pergunta"] }
           }
         }
       }

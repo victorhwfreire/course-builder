@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "course-builder",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": { "name": "IA Para Devs (CESAR 2026)" },
-  "description": "Reusable Claude Code plugin that turns a module.spec.yaml into a full course-module artifact bundle (ementa, student git repo with planted verified bugs, lesson plans, Gamma slide instructions, 1st-person instructor scripts, HTML portal) by orchestrating 9 subagents, 2 skills and 2 PreToolUse hooks via the /course-builder:build-module command. Components in commands/, agents/, skills/ and hooks/hooks.json are auto-discovered."
+  "description": "Reusable Claude Code plugin that turns a module.spec.yaml into a full course-module artifact bundle by orchestrating 12 subagents, 3 skills and 2 PreToolUse hooks via the /course-builder:build-module command. Modes: repo-bugs (student repo with planted verified bugs), projeto-pitch, debate-caso, and estudo-dirigido (expository lessons on one fictional case with an executable kit, one single-source file per lesson rendered by bundled generators into deck, script, plan, figures, study-guide PDF and monitor, interactive and instructor guides, with real recorded demo runs). Components in commands/, agents/, skills/ and hooks/hooks.json are auto-discovered."
 }

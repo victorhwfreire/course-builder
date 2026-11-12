@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
+<!-- publicar:inicio -->
+<title>[Curso] · Encontro [N]</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap">
+<style>
+/* Caderno de laboratório: texto em coluna de leitura, bancadas na largura toda.
+   CESAR Design System, tema único claro. */
+:root{
+  --papel:#FFFFFF; --superficie:#FFFFFF; --superficie-2:#F8F7F6; --superficie-3:#F1F0EE;
+  --tinta:#0C0B0A; --texto:#2A2825; --tinta-2:#403E3B; --tinta-3:#5C5955;
+  --linha:#E4E2DF; --linha-forte:#A5A19C;
+  --marca:#FF6002; --marca-tx:#DD3805; --marca-forte:#B32C04; --marca-suave:#FFF2EB;
+  --selo-bg:#FFF2EB; --selo-tx:#B32C04; --btn-bg:#DD3805; --btn-tx:#FFFFFF; --sobre-marca:#FFFFFF;
+  --erro:#E23A2E; --erro-suave:#FCEBEA; --aviso:#F5A623; --aviso-suave:#FEF4E1;
+  --certo:#1F9D55; --certo-suave:#E7F6EE; --ia:#5C5955;
+  --sombra:0 4px 12px rgba(12,11,10,.08),0 2px 4px rgba(12,11,10,.04);
+  --f-display:"DM Sans","Helvetica Neue",Arial,sans-serif;
+  --f-texto:"DM Sans","Helvetica Neue",Arial,sans-serif;
+  --f-codigo:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace;
+  --raio:12px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+body{background:var(--papel);color:var(--texto);font-family:var(--f-texto);font-size:18px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--papel)}
+a{color:var(--marca-tx);text-underline-offset:3px}
+:focus-visible{outline:3px solid var(--marca);outline-offset:2px;border-radius:4px}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0;color:var(--tinta)}
+h2{font-size:clamp(1.85rem,3.6vw,2.6rem);font-weight:800;letter-spacing:-.015em}
+h3{font-size:1.25rem;font-weight:700}
+h4{font-size:1.05rem;font-weight:700}
+p{margin:0}
+code,pre{font-family:var(--f-codigo)}
+:not(pre)>code{font-size:.86em;background:var(--superficie-2);border:1px solid var(--linha);padding:.05em .35em;border-radius:5px;overflow-wrap:anywhere;color:var(--tinta)}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.prosa{max-width:68ch;display:flex;flex-direction:column;gap:1rem}
+.prosa ul{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.35rem}
+
+.trilha{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--papel) 90%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--linha)}
+.trilha .wrap{display:flex;align-items:center;gap:14px;min-height:54px}
+.trilha .marca{font-family:var(--f-display);font-weight:800;font-size:.98rem;white-space:nowrap;color:var(--tinta);text-decoration:none}
+.trilha nav{overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.trilha nav::-webkit-scrollbar{display:none}
+.trilha ol{list-style:none;margin:0;padding:0;display:flex;gap:4px}
+.trilha a{display:block;white-space:nowrap;text-decoration:none;color:var(--tinta-2);font-size:.86rem;font-weight:600;padding:6px 10px;border-radius:999px}
+.trilha a:hover{background:var(--superficie-2);color:var(--tinta)}
+.trilha a.ativo{background:var(--selo-bg);color:var(--selo-tx)}
+@media (max-width:640px){.trilha .marca{display:none}}
+
+.abertura{padding-block:56px 40px}
+.abertura .wrap{display:flex;flex-direction:column;gap:22px}
+.sobrelinha{font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--marca-tx);font-weight:700}
+.abertura h1{font-size:clamp(2.3rem,6vw,4.2rem);font-weight:800;letter-spacing:-.03em;max-width:18ch}
+.abertura h1 .mais{color:var(--marca)}
+.abertura .lide{font-size:1.22rem;line-height:1.55;color:var(--tinta-2);max-width:64ch}
+.fio{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));margin-top:10px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--superficie);overflow:hidden;box-shadow:var(--sombra)}
+.fio a{position:relative;display:flex;flex-direction:column;gap:4px;padding:16px 18px 18px;text-decoration:none;color:var(--tinta);border-right:1px solid var(--linha);min-width:0}
+.fio a:last-child{border-right:0;background:var(--marca-suave)}
+.fio a:hover{background:var(--superficie-2)}
+.fio a:last-child:hover{background:var(--marca-suave)}
+.fio .n{font-family:var(--f-codigo);font-size:.74rem;color:var(--tinta-3);font-weight:600}
+.fio strong{font-family:var(--f-display);font-size:1.08rem}
+.fio span.d{font-size:.88rem;color:var(--tinta-2);line-height:1.35}
+.fio a:not(:last-child)::after{content:"";position:absolute;right:-7px;top:50%;width:12px;height:12px;background:var(--superficie);border-top:1px solid var(--linha);border-right:1px solid var(--linha);transform:translateY(-50%) rotate(45deg);z-index:1}
+@media (max-width:900px){.fio{grid-template-columns:repeat(3,minmax(0,1fr))}.fio a:nth-child(3){border-right:0}.fio a:nth-child(-n+3){border-bottom:1px solid var(--linha)}.fio a:nth-child(3)::after{display:none}}
+@media (max-width:520px){.fio{grid-template-columns:1fr}.fio a{border-right:0;border-bottom:1px solid var(--linha)}.fio a::after{display:none}}
+.carimbo{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:.88rem;color:var(--tinta-3)}
+.carimbo b{color:var(--tinta-2);font-weight:600}
+.como{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.como div{display:flex;gap:10px;align-items:flex-start;font-size:.96rem;color:var(--tinta-2);line-height:1.45}
+.como b{color:var(--tinta)}
+.como span>b:first-child{display:block}
+.como i{flex:0 0 28px;height:28px;border-radius:50%;display:grid;place-items:center;font-style:normal;font:700 .82rem var(--f-codigo);background:var(--superficie-3);color:var(--tinta)}
+@media (max-width:720px){.como{grid-template-columns:1fr}}
+
+.secao{padding-block:64px 28px;border-top:1px solid var(--linha)}
+.secao>.wrap{display:flex;flex-direction:column;gap:26px}
+.secao-cab{display:flex;flex-direction:column;gap:12px;max-width:70ch}
+.secao-cab .sobrelinha{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.secao-cab .sobrelinha i{font-style:normal;display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:6px;background:var(--tinta);color:var(--papel);font-size:.8rem}
+.secao-cab .tempo{font-family:var(--f-codigo);font-size:.72rem;color:var(--tinta-3);letter-spacing:.04em;font-weight:600;text-transform:none}
+.definicao{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:baseline;max-width:70ch;padding:16px 20px;background:var(--superficie);border:1px solid var(--linha);border-left:4px solid var(--marca);border-radius:0 var(--raio) var(--raio) 0}
+.definicao .rot{font-family:var(--f-codigo);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--marca-tx);font-weight:600}
+.definicao p{font-size:1.12rem;line-height:1.5;color:var(--tinta)}
+.definicao small{grid-column:2;font-size:.82rem;color:var(--tinta-3)}
+@media (max-width:520px){.definicao{grid-template-columns:1fr}.definicao small{grid-column:1}}
+.nota{max-width:70ch;display:flex;flex-direction:column;gap:6px;padding:14px 18px;border-radius:var(--raio);background:var(--superficie-2);font-size:.98rem;line-height:1.55;color:var(--tinta-2)}
+.nota>b:first-child{font-family:var(--f-codigo);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta)}
+.nota.armadilha{background:var(--erro-suave);box-shadow:inset 4px 0 0 var(--erro)}
+.nota.projeto{background:var(--marca-suave);box-shadow:inset 4px 0 0 var(--marca)}
+.nota.projeto>b:first-child{color:var(--marca-forte)}
+.nota.regra{background:var(--certo-suave);box-shadow:inset 4px 0 0 var(--certo)}
+.ambiente{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ambiente div{padding:14px 16px;border:1px solid var(--linha);border-radius:10px;background:var(--superficie);font-size:.95rem;line-height:1.45;color:var(--tinta-2)}
+.ambiente b{display:block;font-family:var(--f-display);font-size:1.04rem;color:var(--tinta);margin-bottom:2px}
+@media (max-width:760px){.ambiente{grid-template-columns:1fr}}
+
+/* fala real do professor, com a fonte */
+.fala{max-width:760px;margin:0;padding:20px 24px;border-radius:var(--raio);background:var(--superficie-2);border:1px solid var(--linha);display:flex;flex-direction:column;gap:10px}
+.fala blockquote{margin:0;font-family:var(--f-display);font-size:clamp(1.2rem,2.4vw,1.5rem);line-height:1.4;font-weight:600;color:var(--tinta)}
+.fala blockquote::before{content:"“";color:var(--marca);font-weight:800;margin-right:2px}
+.fala blockquote::after{content:"”";color:var(--marca);font-weight:800;margin-left:2px}
+.fala figcaption{font-size:.86rem;color:var(--tinta-3)}
+.fala figcaption b{color:var(--tinta-2);font-weight:600}
+
+/* fluxogramas: tracejado = produzido por IA; borda verde = julgamento humano; laranja cheio = ponto de chegada */
+.fluxo{display:flex;align-items:stretch;gap:0;flex-wrap:nowrap;overflow-x:auto;padding:4px 2px 8px}
+.fluxo .no{flex:1 1 0;min-width:120px;padding:12px 14px;border:2px solid var(--linha-forte);border-radius:12px;background:var(--superficie-2);display:flex;flex-direction:column;gap:2px;justify-content:center;text-align:center;font-size:.9rem;line-height:1.35;color:var(--tinta-2);transition:background .25s,border-color .25s,box-shadow .25s,opacity .25s}
+.fluxo .no b,.decisao-fx .no b,.convergencia .no b{font-family:var(--f-display);font-size:1rem;color:var(--tinta)}
+.no.ia{background:var(--superficie);border-style:dashed;border-color:var(--ia)}
+.no.humano{background:var(--superficie);border-color:var(--certo);border-width:3px}
+.no.foco{background:var(--marca-tx);border-color:var(--marca-tx);color:var(--sobre-marca)}
+.no.foco b{color:var(--sobre-marca)}
+.no.aceso{box-shadow:0 0 0 4px var(--marca);border-color:var(--marca)}
+.no.apagado{opacity:.4;border-style:dashed;border-color:var(--erro)}
+.fluxo .seta{flex:0 0 34px;display:grid;place-items:center;color:var(--tinta-3);font-weight:700;font-size:1.2rem}
+@media (max-width:620px){.fluxo{flex-direction:column}.fluxo .no{min-width:0}.fluxo .seta{flex-basis:26px;transform:rotate(90deg)}}
+.legenda-fluxo{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.82rem;color:var(--tinta-3)}
+.legenda-fluxo span{display:inline-flex;align-items:center;gap:6px}
+.legenda-fluxo i{display:inline-block;width:22px;height:14px;border-radius:4px;border:2px solid var(--linha-forte);background:var(--superficie-2)}
+.legenda-fluxo i.ia{border-style:dashed;border-color:var(--ia);background:var(--superficie)}
+.legenda-fluxo i.humano{border-color:var(--certo);background:var(--superficie)}
+.legenda-fluxo i.foco{border-color:var(--marca-tx);background:var(--marca-tx)}
+.convergencia{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);gap:10px;align-items:center;max-width:820px}
+.convergencia .entradas{display:flex;flex-direction:column;gap:10px}
+.convergencia .no,.decisao-fx .no{padding:12px 14px;border:2px solid var(--linha-forte);border-radius:12px;background:var(--superficie-2);display:flex;flex-direction:column;gap:2px;text-align:center;font-size:.9rem;line-height:1.35;color:var(--tinta-2)}
+.convergencia .seta{text-align:center;color:var(--tinta-3);font-weight:700;font-size:1.3rem}
+@media (max-width:620px){.convergencia{grid-template-columns:1fr}.convergencia .seta{transform:rotate(90deg)}}
+.decisao-fx{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr) minmax(0,2.4fr);gap:12px;align-items:center}
+.losango{justify-self:center;width:170px;height:170px;display:grid;place-items:center;position:relative}
+.losango::before{content:"";position:absolute;inset:22px;background:var(--aviso-suave);border:2.5px solid var(--aviso);transform:rotate(45deg);border-radius:8px}
+.losango span{position:relative;text-align:center;font-size:.9rem;font-weight:700;color:var(--tinta);max-width:110px;line-height:1.3}
+.ramos{display:flex;flex-direction:column;gap:14px}
+.ramo{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ramo>small{font:700 .78rem var(--f-codigo);text-transform:uppercase;letter-spacing:.05em;color:var(--tinta-3);width:36px}
+.ramo .no{flex:1 1 140px}
+.ramo .s{color:var(--tinta-3);font-weight:700}
+@media (max-width:760px){.decisao-fx{grid-template-columns:1fr}.ramo .s{display:none}}
+
+/* bancadas */
+.bancada{background:var(--superficie);border:1px solid var(--linha);border-radius:16px;box-shadow:var(--sombra);overflow:hidden;min-width:0}
+.bancada-cab{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding:16px 20px 14px;border-bottom:1px solid var(--linha);background:linear-gradient(var(--superficie-2),var(--superficie))}
+.selo{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--selo-tx);background:var(--selo-bg);padding:4px 11px;border-radius:999px}
+.selo.real{background:var(--certo-suave);color:var(--tinta)}
+.bancada-cab h3{font-size:1.16rem}
+.bancada-cab p{flex-basis:100%;font-size:.95rem;color:var(--tinta-2);line-height:1.45}
+.bancada-corpo{padding:18px 20px 20px;display:flex;flex-direction:column;gap:16px}
+.controles{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.campo{display:flex;flex-direction:column;gap:4px;font-size:.86rem;color:var(--tinta-2);font-weight:600;min-width:0;max-width:100%}
+select{max-width:100%;font:500 .95rem var(--f-texto);color:var(--tinta);background:var(--superficie);border:1px solid var(--linha-forte);border-radius:7px;padding:7px 10px}
+.btn{font:700 .9rem var(--f-texto);padding:9px 18px;border-radius:999px;border:1px solid var(--btn-bg);background:var(--btn-bg);color:var(--btn-tx);cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.sec{background:var(--superficie);color:var(--tinta);border-color:var(--linha-forte)}
+.btn:disabled{opacity:.45;cursor:default;filter:none}
+.btn.vivo::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--btn-tx);margin-right:8px;vertical-align:1px}
+.explica{font-size:1rem;line-height:1.55;color:var(--tinta-2);padding:12px 14px;border-radius:9px;background:var(--superficie-2);min-height:3em}
+.explica b{color:var(--tinta)}
+.aviso-vivo{font-size:.86rem;color:var(--tinta-3)}
+.passos-nav{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.pontos{display:flex;gap:6px;flex-wrap:wrap}
+.pontos button{width:32px;height:32px;border-radius:50%;border:1px solid var(--linha-forte);background:var(--superficie);color:var(--tinta-2);font:700 .8rem var(--f-codigo);cursor:pointer}
+.pontos button.feito{background:var(--superficie-3);color:var(--tinta)}
+.pontos button.atual{background:var(--btn-bg);border-color:var(--btn-bg);color:var(--btn-tx)}
+.passo-tit{display:flex;flex-direction:column;gap:2px}
+.passo-tit small{font-family:var(--f-codigo);font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--marca-forte);font-weight:600}
+.passo-tit strong{font-family:var(--f-display);font-size:1.2rem;color:var(--tinta)}
+
+/* abas com dois lados: o que se vê sem e com a evidência (padrão de Eric) */
+.abas{display:flex;flex-wrap:wrap;gap:6px}
+.abas button{font:600 .9rem var(--f-texto);padding:7px 14px;border-radius:999px;border:1px solid var(--linha-forte);background:var(--superficie);color:var(--tinta-2);cursor:pointer}
+.abas button small{font-family:var(--f-codigo);font-size:.72rem;color:var(--tinta-3);margin-right:6px}
+.abas button[aria-selected="true"]{background:var(--btn-bg);border-color:var(--btn-bg);color:var(--btn-tx)}
+.abas button[aria-selected="true"] small{color:var(--btn-tx)}
+.motivo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.motivo .lado{padding:14px 16px;border-radius:12px;border:1px solid var(--linha);background:var(--superficie);display:flex;flex-direction:column;gap:6px;font-size:.96rem;line-height:1.5;color:var(--tinta-2);min-width:0}
+.motivo .lado b.rot{font:700 .72rem var(--f-codigo);letter-spacing:.07em;text-transform:uppercase}
+.motivo .sem{border-style:dashed;border-color:var(--ia)}
+.motivo .sem b.rot{color:var(--tinta-3)}
+.motivo .com{border:3px solid var(--certo)}
+.motivo .com b.rot{color:var(--certo)}
+.motivo .ponte{grid-column:1/-1;padding:12px 16px;border-top:1px dashed var(--linha-forte);font-size:1rem;font-weight:600;color:var(--tinta)}
+.motivo .ponte.fim{border-top:0;border-radius:10px;background:var(--certo-suave);box-shadow:inset 4px 0 0 var(--certo)}
+.motivo .disse{grid-column:1/-1;padding:12px 16px;border-radius:10px;background:var(--marca-suave);font-size:.98rem;color:var(--tinta);line-height:1.5}
+.motivo .disse small{display:block;font:700 .7rem var(--f-codigo);letter-spacing:.08em;text-transform:uppercase;color:var(--marca-forte);margin-bottom:2px}
+.motivo pre{margin:0;padding:10px 12px;border-radius:8px;background:var(--superficie-2);border:1px solid var(--linha);font-size:.8rem;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--texto)}
+@media (max-width:720px){.motivo{grid-template-columns:1fr}}
+
+/* passo a passo com painel de estado ao lado (padrão de Eric) */
+.ciclo-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px;align-items:start}
+.ciclo-palco{display:flex;flex-direction:column;gap:12px;min-width:0}
+.estado-base{border:1px solid var(--linha);border-radius:12px;background:var(--superficie-2);padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-width:0;position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px)}
+.estado-rot{font:700 .7rem var(--f-codigo);letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-3)}
+.mini-arq{display:flex;flex-direction:column;gap:6px}
+.mini-nome{font:600 .8rem var(--f-codigo);color:var(--marca-forte)}
+.mini-arq ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.mini-arq li{padding:8px 10px;border-radius:8px;background:var(--superficie);border:1px solid var(--linha);font-size:.84rem;line-height:1.4;color:var(--tinta-2);overflow-wrap:anywhere}
+.mini-arq li code{font-size:.78rem}
+.mini-arq li.novo{border-color:var(--marca);box-shadow:0 0 0 2px var(--marca-suave)}
+.mini-arq li.vazio{border-style:dashed;color:var(--tinta-3);font-style:italic}
+.mini-arq pre{margin:0;padding:8px 10px;border-radius:8px;background:var(--superficie);border:1px solid var(--linha);font-size:.76rem;line-height:1.5;white-space:pre-wrap;color:var(--texto)}
+@media (max-width:900px){.ciclo-grid{grid-template-columns:1fr}.estado-base{position:static}}
+.conversa{display:flex;flex-direction:column;gap:8px}
+.msg{max-width:90%;padding:10px 14px;border-radius:12px;font-size:.94rem;line-height:1.45;color:var(--tinta)}
+.msg b{display:block;font:700 .72rem var(--f-codigo);letter-spacing:.06em;color:var(--tinta-3)}
+.msg.ag{align-self:flex-start;background:var(--superficie-3);border:1px dashed var(--ia)}
+.msg.qa{align-self:flex-end;background:var(--certo-suave)}
+
+/* explorador de arquivos (padrão de Eric) */
+.explorador{display:grid;grid-template-columns:minmax(0,270px) minmax(0,1fr);border:1px solid var(--linha);border-radius:12px;overflow:hidden;min-height:380px;background:var(--superficie)}
+.arvore{background:var(--superficie-2);border-right:1px solid var(--linha);padding:10px 8px;display:flex;flex-direction:column;gap:2px;font-family:var(--f-codigo);font-size:.82rem;max-height:520px;overflow-y:auto}
+.arvore .pasta{padding:6px 8px 2px;color:var(--tinta-3);font-weight:600}
+.arvore button{display:flex;align-items:center;gap:8px;text-align:left;font:inherit;padding:5px 8px;border:0;border-radius:6px;background:none;color:var(--tinta-2);cursor:pointer}
+.arvore button.n2{padding-left:24px}
+.arvore button:hover{background:var(--superficie-3);color:var(--tinta)}
+.arvore button[aria-selected="true"]{background:var(--selo-bg);color:var(--selo-tx);font-weight:700}
+.leitor{display:flex;flex-direction:column;min-width:0}
+.leitor-cab{padding:9px 14px;border-bottom:1px solid var(--linha);font:600 .8rem var(--f-codigo);color:var(--tinta-3)}
+.leitor pre{margin:0;padding:14px 16px;font-size:.82rem;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--texto);background:var(--superficie);flex:1;max-height:440px;overflow-y:auto}
+.leitor .porque{padding:10px 14px;border-top:1px solid var(--linha);background:var(--marca-suave);font-size:.9rem;color:var(--tinta);line-height:1.45}
+@media (max-width:760px){.explorador{grid-template-columns:1fr}.arvore{border-right:0;border-bottom:1px solid var(--linha);max-height:220px}}
+
+/* revisão com a fonte fixa ao lado (padrão de Eric) */
+.revisao{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;align-items:start}
+.revisao-lista{display:flex;flex-direction:column;gap:10px;min-width:0}
+.fonte-fixa{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);border:1px solid var(--linha);border-left:4px solid var(--marca);border-radius:0 12px 12px 0;background:var(--superficie-2);padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0;max-height:calc(100vh - 90px);overflow-y:auto}
+.fonte-fixa .rot{font:700 .7rem var(--f-codigo);letter-spacing:.08em;text-transform:uppercase;color:var(--marca-forte)}
+.fonte-fixa pre{margin:0;font-size:.8rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--texto)}
+@media (max-width:900px){.revisao{grid-template-columns:1fr}.fonte-fixa{position:static;max-height:none}}
+.linha-rev{border:1px solid var(--linha);border-radius:12px;background:var(--superficie);padding:12px 14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .2s,opacity .2s}
+.linha-rev.sel{border-color:var(--marca);box-shadow:0 0 0 2px var(--marca-suave)}
+.linha-rev.sai .campos{text-decoration:line-through;color:var(--tinta-3)}
+.linha-rev .topo{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.linha-rev .topo b{font-family:var(--f-codigo);font-size:.86rem;color:var(--tinta)}
+.linha-rev .campos{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;font-size:.88rem;line-height:1.45;color:var(--tinta-2)}
+.linha-rev .campos dt{font:700 .72rem var(--f-codigo);letter-spacing:.04em;text-transform:uppercase;color:var(--tinta-3);padding-top:2px}
+.linha-rev .campos dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.placar{font:700 .9rem var(--f-codigo);color:var(--tinta-2)}
+
+/* saída do modelo */
+.saida{border:1px solid var(--linha);border-radius:12px;background:var(--superficie);overflow:hidden;min-width:0}
+.saida-cab{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:9px 14px;border-bottom:1px solid var(--linha);background:var(--superficie-2);font-size:.82rem;color:var(--tinta-3)}
+.saida-cab b{color:var(--tinta);font-family:var(--f-codigo);font-size:.8rem}
+.saida-corpo{padding:12px 16px;font-size:.92rem;line-height:1.55;color:var(--texto);display:flex;flex-direction:column;gap:10px;min-width:0}
+.saida-corpo .md-h{font-family:var(--f-display);font-weight:700;color:var(--tinta)}
+.saida-corpo ul,.saida-corpo ol{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:4px}
+.arquivo{border:1px solid var(--linha-forte);border-radius:10px;overflow:hidden}
+.arquivo>small{display:block;padding:6px 12px;border-bottom:1px solid var(--linha);background:var(--superficie-3);font:600 .74rem var(--f-codigo);color:var(--tinta-3)}
+.arquivo>div{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.pensando{color:var(--tinta-3);font-style:italic}
+.pedido{padding:12px 16px;border-radius:10px;background:var(--superficie-2);border:1px solid var(--linha);box-shadow:inset 4px 0 0 var(--tinta);font-family:var(--f-codigo);font-size:.84rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow-y:auto;color:var(--texto)}
+.pedido small{display:block;font-family:var(--f-texto);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-2);font-weight:700;margin-bottom:4px;white-space:normal}
+.rolagem{overflow-x:auto;min-width:0}
+.tabela{width:100%;border-collapse:collapse;font-size:.88rem}
+.tabela th,.tabela td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--linha);vertical-align:top;color:var(--tinta-2)}
+.tabela th{font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--tinta-3)}
+.saida .tabela,.tabela.larga{min-width:640px}
+.tag{display:inline-block;font:700 .72rem var(--f-codigo);padding:2px 8px;border-radius:5px;white-space:nowrap;color:var(--tinta)}
+.tag.s{background:var(--certo-suave);border:1px solid var(--certo)}
+.tag.i{background:var(--aviso-suave);border:1px solid var(--aviso)}
+.tag.x{background:var(--erro-suave);border:1px solid var(--erro)}
+.tag.n{background:var(--superficie-3);border:1px solid var(--linha-forte);color:var(--tinta-2)}
+
+/* comandos para copiar */
+.cmd{position:relative;margin:0;padding:12px 70px 12px 14px;border-radius:10px;background:var(--superficie-3);border:1px solid var(--linha);font-size:.84rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--tinta)}
+.cmd button{position:absolute;top:8px;right:8px;font:700 .74rem var(--f-texto);padding:4px 10px;border-radius:999px;border:1px solid var(--linha-forte);background:var(--superficie);color:var(--tinta);cursor:pointer}
+.passos-lab{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.passos-lab>div{border:1px solid var(--linha);border-radius:12px;background:var(--superficie);padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.passos-lab h4{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.passos-lab h4 small{font:600 .74rem var(--f-codigo);color:var(--tinta-3)}
+.passos-lab p,.passos-lab li{font-size:.92rem;line-height:1.5;color:var(--tinta-2)}
+.passos-lab ol{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:4px}
+
+.cartoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px}
+.cartoes>div{border:1px solid var(--linha);border-radius:12px;background:var(--superficie);padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cartoes h4{font-size:1rem}
+.cartoes p,.cartoes li{font-size:.92rem;line-height:1.5;color:var(--tinta-2)}
+.cartoes ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:3px}
+.cartoes small{font-size:.78rem;color:var(--tinta-3)}
+.cartoes .arq{font:600 .76rem var(--f-codigo);color:var(--marca-forte)}
+.cartoes.fora>div{background:var(--erro-suave);border-color:color-mix(in srgb,var(--erro) 35%,transparent)}
+.quiz{display:flex;flex-direction:column;gap:10px}
+.quiz-q{padding:14px 16px;border:1px solid var(--linha);border-radius:10px;background:var(--superficie);display:flex;flex-direction:column;gap:10px}
+.quiz-q .enun{font-size:.98rem;color:var(--tinta)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.tabela .opts{flex-wrap:nowrap;gap:6px}
+.op{font:600 .86rem var(--f-texto);padding:7px 12px;border-radius:8px;border:1px solid var(--linha-forte);background:var(--superficie);color:var(--tinta);cursor:pointer}
+.op.certo{background:var(--certo-suave);border-color:var(--certo)}
+.op.errado{background:var(--erro-suave);border-color:var(--erro)}
+.op.marcado{background:var(--selo-bg);border-color:var(--marca);color:var(--selo-tx)}
+.fb{font-size:.94rem;color:var(--tinta-2);line-height:1.5}
+.tabela-modos td.res{font-weight:600;color:var(--tinta)}
+.partes{display:flex;flex-wrap:wrap;gap:8px}
+.partes label{display:flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid var(--linha);border-radius:999px;background:var(--superficie);font-size:.9rem;color:var(--tinta);cursor:pointer}
+.partes input{accent-color:var(--marca);width:16px;height:16px}
+details.revelar{max-width:70ch;border:1px solid var(--linha);border-radius:10px;background:var(--superficie)}
+details.revelar summary{cursor:pointer;padding:12px 16px;font-weight:700;list-style:none;display:flex;gap:10px;align-items:center;color:var(--tinta)}
+details.revelar summary::-webkit-details-marker{display:none}
+details.revelar summary::before{content:"+";font-family:var(--f-codigo);color:var(--marca-tx);font-weight:700;width:14px}
+details.revelar[open] summary::before{content:"\2212"}
+details.revelar>div{padding:0 16px 14px 40px;color:var(--tinta-2);font-size:.98rem;line-height:1.55;display:flex;flex-direction:column;gap:8px}
+.argumentos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;max-width:860px}
+.argumentos div{padding:14px 16px;border:1px solid var(--linha);border-radius:12px;background:var(--superficie);font-size:.96rem;line-height:1.5;color:var(--tinta-2)}
+.argumentos b{display:block;font-family:var(--f-display);color:var(--tinta)}
+.argumentos .q{grid-column:1/-1;justify-self:center;padding:12px 22px;border:2px solid var(--marca-tx);border-radius:999px;background:var(--marca-suave);font-weight:700;color:var(--tinta);text-align:center}
+@media (max-width:620px){.argumentos{grid-template-columns:1fr}}
+.checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.checklist li{display:flex;gap:10px;align-items:flex-start;line-height:1.4;color:var(--tinta-2)}
+.checklist li::before{content:"";flex:0 0 14px;height:14px;margin-top:4px;border:2px solid var(--certo);border-radius:4px}
+.mapa-final{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.mapa-final div{padding:16px 18px;border:1px solid var(--linha);border-radius:12px;background:var(--superficie);display:flex;flex-direction:column;gap:6px}
+.mapa-final strong{font-family:var(--f-display);font-size:1.08rem;color:var(--tinta)}
+.mapa-final p{font-size:.95rem;color:var(--tinta-2);line-height:1.45}
+.mapa-final small{font-family:var(--f-codigo);font-size:.72rem;color:var(--tinta-3);letter-spacing:.06em;text-transform:uppercase}
+.mapa-final div:last-child{background:var(--marca-suave);border-color:color-mix(in srgb,var(--marca) 40%,transparent)}
+@media (max-width:860px){.mapa-final{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.mapa-final{grid-template-columns:1fr}}
+.rodape{padding-block:40px 60px;border-top:1px solid var(--linha);font-size:.88rem;color:var(--tinta-3)}
+.rodape .wrap{display:flex;flex-direction:column;gap:10px}
+.rodape ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:4px}
+.rodape b{color:var(--tinta-2)}
+
+/* componentes do guia do E1 (gerador passo a passo, seletor de janela, leque, colunas clicáveis, documento-fonte) */
+.retorno{font-size:.88rem;color:var(--tinta-3);font-style:italic;text-align:center;border-top:2px solid var(--linha-forte);padding-top:6px;margin:0 60px}
+@media (max-width:620px){.fluxo{flex-direction:column}.fluxo .no{min-width:0}.fluxo .seta{flex-basis:26px;transform:rotate(90deg)}.retorno{margin:0}}
+.leque{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);gap:10px;align-items:center;max-width:760px}
+.leque .saidas{display:flex;flex-direction:column;gap:8px}
+.leque .seta{text-align:center;color:var(--tinta-3);font-weight:700;font-size:1.3rem}
+.leque .faixa{grid-column:1/-1;padding:10px 14px;border-radius:9px;background:var(--superficie-3);font-size:.9rem;color:var(--tinta-2);text-align:center}
+@media (max-width:620px){.leque{grid-template-columns:1fr}.leque .seta{transform:rotate(90deg)}}
+input[type="range"]{accent-color:var(--marca);width:220px;max-width:100%}
+.duas{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.duas{grid-template-columns:1fr}}
+.tabela tr.dest td{background:var(--marca-suave)}
+.frase{font-size:1.3rem;line-height:1.5;padding:14px 16px;border-radius:10px;background:var(--superficie-2);border:1px solid var(--linha);color:var(--tinta)}
+.frase .gerado{background:var(--marca-suave);border-bottom:2px solid var(--marca);padding:0 2px;border-radius:3px}
+.frase .novo{background:var(--marca);color:var(--sobre-marca)}
+.candidatos{display:flex;flex-direction:column;gap:6px;max-width:620px}
+.cand{display:grid;grid-template-columns:150px 1fr 52px;gap:10px;align-items:center;font:inherit;font-size:.95rem;background:none;border:1px solid transparent;border-radius:8px;padding:4px 6px;cursor:pointer;text-align:left;color:var(--tinta)}
+.cand:hover{border-color:var(--linha-forte);background:var(--superficie-2)}
+.cand .barra{height:14px;border-radius:7px;background:var(--superficie-3);overflow:hidden}
+.cand .barra i{display:block;height:100%;background:var(--marca);transition:width .3s}
+.cand .pct{font-variant-numeric:tabular-nums;color:var(--tinta-2);text-align:right}
+.cand.escolhido{border-color:var(--marca);background:var(--marca-suave)}
+@media (max-width:520px){.cand{grid-template-columns:110px 1fr 46px}}
+.contagens{display:flex;flex-wrap:wrap;gap:8px}
+.contagens span{font:600 .86rem var(--f-codigo);padding:5px 10px;border-radius:8px;background:var(--superficie-2);border:1px solid var(--linha)}
+.itens-janela{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:8px}
+.item-j{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--linha);border-radius:10px;background:var(--superficie);font-size:.9rem;line-height:1.4;color:var(--tinta-2);cursor:pointer}
+.item-j b{display:block;color:var(--tinta)}
+.item-j input{margin-top:4px;accent-color:var(--marca)}
+.item-j.fixo{background:var(--superficie-2);cursor:default}
+.barra-janela{display:flex;height:34px;border-radius:9px;border:2px solid var(--tinta);overflow:hidden;background:var(--superficie)}
+.barra-janela span{display:grid;place-items:center;font-size:.72rem;font-weight:700;color:var(--tinta);white-space:nowrap;overflow:hidden;border-right:1px solid var(--papel);transition:width .3s}
+.quiz-q .origem{font-size:.8rem;color:var(--tinta-3)}
+.faixas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.faixas button{display:flex;flex-direction:column;gap:6px;text-align:left;padding:0;border:0;background:none;cursor:pointer;font:inherit}
+.faixas .no{width:100%;padding:12px;border:2px dashed var(--ia);border-radius:12px;background:var(--superficie);font-size:.9rem;color:var(--tinta-2)}
+.faixas .no b{display:block;color:var(--tinta);font-family:var(--f-display)}
+.faixas .desce{text-align:center;color:var(--tinta-3);font-weight:700}
+.faixas .q{width:100%;padding:12px;border:3px solid var(--certo);border-radius:12px;background:var(--superficie);font-weight:700;color:var(--tinta);font-size:.95rem}
+.faixas button[aria-pressed="true"] .q{background:var(--certo-suave)}
+.faixas button:last-child .q{background:var(--marca-tx);border-color:var(--marca-tx);color:var(--sobre-marca)}
+.rotulo-faixa{display:flex;justify-content:space-between;font:700 .76rem var(--f-codigo);text-transform:uppercase;letter-spacing:.06em;color:var(--tinta-3)}
+@media (max-width:760px){.faixas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.historia{border:1px solid var(--linha);border-radius:12px;background:var(--superficie);padding:16px 18px;display:flex;flex-direction:column;gap:8px;max-width:820px}
+.historia h3{font-size:1.08rem}
+.historia ul{margin:0;padding-left:1.1rem;font-size:.95rem;line-height:1.5;color:var(--tinta-2);display:flex;flex-direction:column;gap:3px}
+.historia b{color:var(--tinta)}
+</style>
+
+<header class="trilha">
+  <div class="wrap">
+    <a class="marca" href="#topo">Encontro [N]</a>
+    <nav aria-label="Seções do encontro">
+      <ol>
+        <li><a href="#partida">Ponto de partida</a></li>
+        <li><a href="#c1">1 [Conceito]</a></li>
+        <li><a href="#c2">2 [Conceito]</a></li>
+        <li><a href="#demo">Demonstração</a></li>
+        <li><a href="#discussao">Discussão</a></li>
+        <li><a href="#cartao">Cartão</a></li>
+        <li><a href="#fechamento">Fechamento</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="abertura" id="topo">
+  <div class="wrap">
+    <p class="sobrelinha">Encontro [N] de [T] · [Módulo] · [Curso] · CESAR School</p>
+    <h1>[Afirmação que responde à pergunta da aula, com uma <span class="mais">palavra</span> em destaque]</h1>
+    <p class="lide">[Duas ou três frases: o que a aula explica, em quantas ideias, e que cada ideia aparece acontecendo em simuladores e em respostas reais.]</p>
+    <nav class="fio" aria-label="O fio do encontro">
+      <a href="#c1"><span class="n">1</span><strong>[Conceito]</strong><span class="d">[em poucas palavras]</span></a>
+      <a href="#c2"><span class="n">2</span><strong>[Conceito]</strong><span class="d">[em poucas palavras]</span></a>
+      <a href="#c3"><span class="n">3</span><strong>[Conceito]</strong><span class="d">[em poucas palavras]</span></a>
+      <a href="#c4"><span class="n">4</span><strong>[Conceito]</strong><span class="d">[em poucas palavras]</span></a>
+      <a href="#c5"><span class="n">5</span><strong>[Síntese]</strong><span class="d">[em poucas palavras]</span></a>
+      <a href="#fechamento"><span class="n">?</span><strong>A pergunta</strong><span class="d">[a pergunta da aula]</span></a>
+    </nav>
+    <div class="como">
+      <div><i>1</i><span><b>Leia a ideia</b>Cada seção abre com uma definição curta e um exemplo do caso.</span></div>
+      <div><i>2</i><span><b>Mexa na bancada</b>As bancadas são simuladores: mude uma opção e veja o efeito na hora.</span></div>
+      <div><i>3</i><span><b>Confira o real</b>Respostas marcadas como <b>registradas</b> vieram de execuções reais, sem edição. O botão <b>Rodar agora</b> chama o Claude ao vivo.</span></div>
+    </div>
+    <p class="carimbo"><span><b>Execuções registradas:</b> [modelo], [como foi rodado], em [data]</span><span><b>Caso:</b> [caso fictício da disciplina]</span></p>
+  </div>
+</section>
+
+<section class="secao" id="partida">
+  <div class="wrap">
+    <div class="secao-cab">
+      <p class="sobrelinha">Ponto de partida</p>
+      <h2>[Termos antes de começar]</h2>
+    </div>
+    <div class="ambiente">
+      <div><b>[Termo]</b>[Explicação em uma ou duas frases simples.]</div>
+      <div><b>[Termo]</b>[Explicação.]</div>
+      <div><b>[Caso]</b>[O que é o caso e qual documento é a estrela de hoje.]</div>
+    </div>
+    <div class="historia">
+      <h3>[Documento-fonte: a régua de todas as conferências]</h3>
+      <ul>
+        <li><b>[R1.]</b> [Regra.]</li>
+        <li><b>[CA1.]</b> [Critério de aceite.]</li>
+      </ul>
+    </div>
+    <div class="nota projeto"><b>A pergunta deste encontro</b><span>[Pergunta da aula.] Guarde a sua resposta de agora. No fim, a gente compara.</span></div>
+  </div>
+</section>
+
+<!-- Um bloco destes por conceito: sobrelinha, h2 que afirma, definição, prosa que liga ao anterior, fluxograma, bancada, consequência, pergunta para pensar. -->
+<section class="secao" id="c1">
+  <div class="wrap">
+    <div class="secao-cab">
+      <p class="sobrelinha"><i>1</i> Conceito 1 de [M] · [tema]</p>
+      <h2>[Afirmação do conceito]</h2>
+    </div>
+    <div class="definicao"><span class="rot">Definição</span><p>[Definição em uma frase.]</p></div>
+    <div class="prosa">
+      <p>[Analogia do dia a dia e exemplo do caso.]</p>
+    </div>
+    <div class="fluxo" role="img" aria-label="[Descrição textual do fluxograma.]">
+      <div class="no" id="c1-n1"><b>[Etapa]</b>[apoio]</div><span class="seta" aria-hidden="true">→</span>
+      <div class="no" id="c1-n2"><b>[Etapa]</b>[apoio]</div><span class="seta" aria-hidden="true">→</span>
+      <div class="no ia" id="c1-n3"><b>[Feito pela IA]</b>[apoio]</div><span class="seta" aria-hidden="true">→</span>
+      <div class="no humano" id="c1-n4"><b>[Julgamento humano]</b>[apoio]</div><span class="seta" aria-hidden="true">→</span>
+      <div class="no foco" id="c1-n5"><b>[Chegada]</b>[apoio]</div>
+    </div>
+    <p class="legenda-fluxo"><span><i></i>etapa</span><span><i class="ia"></i>produzido por IA</span><span><i class="humano"></i>julgamento humano</span><span><i class="foco"></i>ponto de chegada</span></p>
+
+    <div class="bancada" id="b-c1">
+      <div class="bancada-cab"><span class="selo">Bancada 1</span><h3>[Nome da bancada]</h3><p>[O que mexer e o que observar.]</p></div>
+      <div class="bancada-corpo">
+        <div class="passos-nav">
+          <div class="pontos" id="c1p-pontos" role="group" aria-label="Passos"></div>
+          <button type="button" class="btn sec" id="c1p-voltar">Voltar</button>
+          <button type="button" class="btn" id="c1p-avancar">Próximo passo</button>
+        </div>
+        <div class="passo-tit"><small id="c1p-cont"></small><strong id="c1p-tit"></strong></div>
+        <div class="explica" id="c1p-explica" aria-live="polite"></div>
+        <div id="c1p-corpo"></div>
+        <p class="aviso-vivo">[Se houver valores inventados para ilustrar: “Valores ilustrativos: mostram o mecanismo.”]</p>
+      </div>
+    </div>
+
+    <div class="nota regra"><b>Por que isso importa para quem [profissão]</b><span>[Consequência prática em uma frase.]</span></div>
+    <details class="revelar"><summary>Pergunta para pensar: [pergunta]</summary><div><p>[Resposta curta, com o exemplo do caso.]</p></div></details>
+  </div>
+</section>
+
+<section class="secao" id="c2">
+  <div class="wrap">
+    <div class="secao-cab">
+      <p class="sobrelinha"><i>2</i> Conceito 2 de [M] · [tema]</p>
+      <h2>[Afirmação do conceito]</h2>
+    </div>
+    <div class="definicao"><span class="rot">Definição</span><p>[Definição em uma frase.]</p></div>
+    <div class="bancada" id="b-quiz">
+      <div class="bancada-cab"><span class="selo">Bancada 2</span><h3>[Classifique]</h3><p>[Itens reais para o aluno classificar contra o documento-fonte.]</p></div>
+      <div class="bancada-corpo">
+        <div class="nota" style="max-width:none"><b>A chave</b><span><span class="tag s">Sustentado</span> há trecho e ele confere. <span class="tag i">Inferido</span> decorre do que está escrito; vira pergunta. <span class="tag x">Inventado</span> não decorre, ou o trecho citado não diz isso.</span></div>
+        <div class="quiz" id="quiz"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="secao" id="demo">
+  <div class="wrap">
+    <div class="secao-cab">
+      <p class="sobrelinha">Demonstração · a mesma tarefa em dois atos</p>
+      <h2>[Afirmação sobre o que os dois atos mostram]</h2>
+    </div>
+    <div class="prosa">
+      <p><b>A tarefa:</b> [tarefa]. No <b>Ato 1</b>, [condição sem a informação]. No <b>Ato 2</b>, [condição com a informação].</p>
+      <p>As saídas abaixo são <b>execuções reais</b>, registradas em [data] com o [modelo]. O texto não foi editado.</p>
+    </div>
+    <div class="bancada" id="b-ato1">
+      <div class="bancada-cab"><span class="selo">Ato 1</span><h3>[Condição]</h3><p>Avance um passo de cada vez. Conceitos à vista: [lista].</p></div>
+      <div class="bancada-corpo">
+        <div class="passos-nav">
+          <div class="pontos" id="a1-pontos" role="group" aria-label="Passos do Ato 1"></div>
+          <button type="button" class="btn sec" id="a1-voltar">Voltar</button>
+          <button type="button" class="btn" id="a1-avancar">Próximo passo</button>
+        </div>
+        <div class="passo-tit"><small id="a1-cont"></small><strong id="a1-tit"></strong></div>
+        <div class="explica" id="a1-explica" aria-live="polite"></div>
+        <div id="a1-corpo"></div>
+        <div class="controles" data-ao-vivo hidden>
+          <button type="button" class="btn vivo" id="a1-rodar">Rodar o Ato 1 agora</button>
+          <span class="aviso-vivo" id="a1-aviso"></span>
+        </div>
+        <div class="saida" data-ao-vivo hidden><div class="saida-cab"><b>Ao vivo</b><span>o mesmo pedido, rodado agora</span></div><div class="saida-corpo" id="a1-vivo"><p class="pensando">Clique em Rodar o Ato 1 agora para uma nova execução.</p></div></div>
+      </div>
+    </div>
+    <p class="aviso-vivo" data-sem-ao-vivo>Os botões ao vivo aparecem quando esta página está aberta no Claude e você permite que ela use o Claude. As execuções registradas funcionam em qualquer lugar.</p>
+  </div>
+</section>
+
+<section class="secao" id="discussao">
+  <div class="wrap">
+    <div class="secao-cab">
+      <p class="sobrelinha">Discussão</p>
+      <h2>[Pergunta de discussão]</h2>
+    </div>
+    <div class="argumentos">
+      <div><b>Argumento A</b>[Argumento com exemplo real dos atos.]</div>
+      <div><b>Argumento B</b>[Argumento com exemplo real dos atos.]</div>
+      <div class="q">[Pergunta da aula]</div>
+    </div>
+    <details class="revelar"><summary>[Pergunta de aprofundamento]</summary><div><p>[Resposta.]</p></div></details>
+  </div>
+</section>
+
+<section class="secao" id="cartao">
+  <div class="wrap">
+    <div class="secao-cab">
+      <p class="sobrelinha">Cartão de consulta</p>
+      <h2>O que levar para o trabalho amanhã</h2>
+    </div>
+    <div class="cartoes">
+      <div><h4>As ideias</h4><p><b>1.</b> [Uma linha.]<br><b>2.</b> [Uma linha.]</p></div>
+      <div><h4>A chave</h4><p><span class="tag s">Sustentado</span> [...]<br><span class="tag i">Inferido</span> [...]<br><span class="tag x">Inventado</span> [...]</p></div>
+      <div><h4>Antes de aceitar uma resposta</h4><ul class="checklist"><li>[Pergunta de conferência]</li><li>[Pergunta de conferência]</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="secao" id="fechamento">
+  <div class="wrap">
+    <div class="secao-cab">
+      <p class="sobrelinha">Fechamento</p>
+      <h2>[A resposta da pergunta da aula, em uma frase]</h2>
+    </div>
+    <div class="mapa-final">
+      <div><small>1 · [Conceito]</small><strong>[Frase curta]</strong><p>[Consequência.]</p></div>
+      <div><small>2 · [Conceito]</small><strong>[Frase curta]</strong><p>[Consequência.]</p></div>
+      <div><small>Resposta</small><strong>[Resposta]</strong><p>[Em uma frase.]</p></div>
+    </div>
+    <div class="nota projeto"><b>Antes do próximo encontro</b><span>[Preparação em uma linha.]</span></div>
+  </div>
+</section>
+</main>
+
+<footer class="rodape">
+  <div class="wrap">
+    <p><b>Sobre as execuções.</b> As saídas marcadas como registradas foram geradas em [data] pelo modelo [modelo], [como], cada uma numa conversa nova. O pedido enviado está mostrado em cada uma, e todos vieram precedidos da instrução de experimento: “[prefixo]”. O texto da resposta não foi editado. As respostas ao vivo usam o Claude da conta de quem abre a página e podem vir de outro modelo. [Quais bancadas usam valores ilustrativos.]</p>
+    <p><b>Fontes citadas</b></p>
+    <ul>
+      <li>[Autor. <a href="https://exemplo.org">Título</a>. Veículo, ano.]</li>
+    </ul>
+    <p>[Curso] · CESAR School · [Módulo], encontro [N] · [Docente]</p>
+  </div>
+</footer>
+
+<script type="text/plain" id="txt-a1">[Cole aqui a saída registrada, sem editar. Pode ter **negrito**, `código`, listas e tabelas em Markdown.
+
+| Caso | Entrada | Resultado esperado |
+|---|---|---|
+| CT01 | [entrada] | [resultado] |]</script>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var texto = function (id) { return $(id).textContent.replace(/^\s+|\s+$/g, ""); };
+
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function inline(s) {
+    s = esc(s);
+    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+    s = s.replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<i>$2</i>");
+    return s;
+  }
+  var celulas = function (r) { return r.trim().replace(/^\||\|$/g, "").split("|").map(function (c) { return c.trim(); }); };
+  /* Markdown mínimo: tabelas, títulos, listas, cercas de código; sempre escapa o HTML antes */
+  function md(src) {
+    var L = src.replace(/\r/g, "").split("\n"), out = [], i = 0;
+    while (i < L.length) {
+      var l = L[i];
+      var cerca = /^\s*```\s*(\w*)\s*$/.exec(l);
+      if (cerca) {
+        var dentro = [];
+        i++;
+        while (i < L.length && !/^\s*```\s*$/.test(L[i])) { dentro.push(L[i]); i++; }
+        i++;
+        if (cerca[1] === "markdown") out.push('<div class="arquivo"><small>conteúdo do arquivo</small><div>' + md(dentro.join("\n")) + "</div></div>");
+        else out.push('<pre class="cmd">' + esc(dentro.join("\n")) + "</pre>");
+        continue;
+      }
+      if (/^\s*\|/.test(l)) {
+        var rows = [];
+        while (i < L.length && /^\s*\|/.test(L[i])) { rows.push(L[i]); i++; }
+        var cab = celulas(rows[0]);
+        var corpo = rows.slice(1).filter(function (r) { return !/^\s*\|?\s*:?-{2,}/.test(r); });
+        out.push('<div class="rolagem"><table class="tabela"><thead><tr>' + cab.map(function (h) { return "<th>" + inline(h) + "</th>"; }).join("") +
+          "</tr></thead><tbody>" + corpo.map(function (r) { return "<tr>" + celulas(r).map(function (c) { return "<td>" + inline(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>");
+        continue;
+      }
+      if (/^#{1,4}\s/.test(l)) { out.push('<p class="md-h">' + inline(l.replace(/^#+\s*/, "")) + "</p>"); i++; continue; }
+      if (/^\s*[-*]\s+/.test(l)) {
+        var it = [];
+        while (i < L.length && /^\s*[-*]\s+/.test(L[i])) { it.push(L[i].replace(/^\s*[-*]\s+/, "")); i++; }
+        out.push("<ul>" + it.map(function (x) { return "<li>" + inline(x) + "</li>"; }).join("") + "</ul>");
+        continue;
+      }
+      if (/^\s*\d+\.\s+/.test(l)) {
+        var ol = [];
+        while (i < L.length && /^\s*\d+\.\s+/.test(L[i])) { ol.push(L[i].replace(/^\s*\d+\.\s+/, "")); i++; }
+        out.push("<ol>" + ol.map(function (x) { return "<li>" + inline(x) + "</li>"; }).join("") + "</ol>");
+        continue;
+      }
+      if (!l.trim()) { i++; continue; }
+      var par = [];
+      while (i < L.length && L[i].trim() && !/^\s*(\||#{1,4}\s|[-*]\s|\d+\.\s|```)/.test(L[i])) { par.push(L[i]); i++; }
+      out.push("<p>" + inline(par.join(" ")) + "</p>");
+    }
+    return out.join("");
+  }
+  function caixaSaida(rotulo, detalhe, conteudo) {
+    return '<div class="saida"><div class="saida-cab"><b>' + rotulo + "</b><span>" + detalhe + '</span></div><div class="saida-corpo">' + conteudo + "</div></div>";
+  }
+  function caixaPedido(rotulo, txt) { return '<div class="pedido"><small>' + rotulo + "</small>" + esc(txt) + "</div>"; }
+
+  /* Claude ao vivo: controles [data-ao-vivo] só aparecem quando o sample está disponível. */
+  var SAMPLE = null;
+  function mostrarAoVivo(sim) {
+    document.querySelectorAll("[data-ao-vivo]").forEach(function (el) { el.hidden = !sim; });
+    document.querySelectorAll("[data-sem-ao-vivo]").forEach(function (el) { el.hidden = sim; });
+  }
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("sample").then(function (f) { if (f) { SAMPLE = f; mostrarAoVivo(true); } }).catch(function () {});
+  }
+  function mensagemErro(codigo) {
+    if (codigo === "not_granted" || codigo === "sampling_disabled") return "O uso do Claude não foi liberado para esta página. As execuções registradas continuam disponíveis.";
+    if (codigo === "rate_limited") return "Muitas chamadas seguidas. Espere um pouco e tente de novo.";
+    if (codigo === "session_expired") return "Sua sessão expirou. Entre de novo no Claude e recarregue a página.";
+    if (codigo === "refused") return "O Claude não respondeu a este pedido.";
+    return "A chamada não terminou. Tente de novo em alguns instantes.";
+  }
+  function rodar(prompt, alvo, aviso, botao, aoTerminar) {
+    if (!SAMPLE) return;
+    botao.disabled = true;
+    aviso.textContent = "";
+    alvo.innerHTML = '<p class="pensando">Pensando… a primeira parte da resposta costuma levar alguns segundos.</p>';
+    SAMPLE(prompt, { cache: false, onText: function (u) { alvo.innerHTML = md(u.text); } })
+      .then(function (r) {
+        aviso.textContent = r.truncated ? "Resposta ao vivo, cortada pelo limite de tamanho." : "Resposta ao vivo, gerada agora.";
+        if (aoTerminar) aoTerminar(r.text);
+      })
+      .catch(function (e) {
+        alvo.innerHTML = e && e.text ? md(e.text) : "";
+        if (!(e && e.code === "cancelled")) aviso.textContent = mensagemErro(e && e.code);
+        if (e && (e.code === "not_granted" || e.code === "sampling_disabled")) mostrarAoVivo(false);
+      })
+      .then(function () { botao.disabled = false; });
+  }
+
+  /* trilha: marca a seção visível */
+  var links = Array.prototype.slice.call(document.querySelectorAll(".trilha a"));
+  if ("IntersectionObserver" in window) {
+    var obs = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) links.forEach(function (a) { a.classList.toggle("ativo", a.getAttribute("href") === "#" + e.target.id); });
+      });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    document.querySelectorAll("main section[id]").forEach(function (s) { obs.observe(s); });
+  }
+
+  /* copiar comandos */
+  document.querySelectorAll("pre.cmd").forEach(function (pre) {
+    var b = document.createElement("button");
+    b.type = "button"; b.textContent = "Copiar";
+    b.addEventListener("click", function () {
+      var t = pre.firstChild.textContent;
+      var marcar = function () { var r = document.createRange(); r.selectNodeContents(pre.firstChild); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selecionado"; };
+      try {
+        navigator.clipboard.writeText(t).then(function () { b.textContent = "Copiado"; }, marcar);
+      } catch (e) { marcar(); }
+      setTimeout(function () { b.textContent = "Copiar"; }, 1800);
+    });
+    pre.appendChild(b);
+  });
+
+  /* passo a passo: cada passo tem t (título), e (explicação), c() opcional (conteúdo), depois() opcional e acende opcional (ids de nós do fluxograma) */
+  function stepper(pref, passos) {
+    var atual = 0, pontos = $(pref + "-pontos"), acesos = [];
+    pontos.innerHTML = passos.map(function (p, i) { return '<button type="button" data-i="' + i + '" aria-label="Passo ' + (i + 1) + '">' + (i + 1) + "</button>"; }).join("");
+    function ir(i) {
+      atual = Math.max(0, Math.min(passos.length - 1, i));
+      var p = passos[atual];
+      pontos.querySelectorAll("button").forEach(function (b, k) { b.className = k === atual ? "atual" : (k < atual ? "feito" : ""); });
+      $(pref + "-cont").textContent = "Passo " + (atual + 1) + " de " + passos.length;
+      $(pref + "-tit").textContent = p.t;
+      $(pref + "-explica").innerHTML = p.e;
+      $(pref + "-corpo").innerHTML = p.c ? p.c() : "";
+      acesos.forEach(function (n) { n.classList.remove("aceso"); });
+      acesos = (p.acende || []).map(function (id) { var n = $(id); n.classList.add("aceso"); return n; });
+      if (p.depois) p.depois();
+      $(pref + "-voltar").disabled = atual === 0;
+      $(pref + "-avancar").disabled = atual === passos.length - 1;
+    }
+    pontos.addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) ir(Number(b.getAttribute("data-i"))); });
+    $(pref + "-voltar").addEventListener("click", function () { ir(atual - 1); });
+    $(pref + "-avancar").addEventListener("click", function () { ir(atual + 1); });
+    ir(0);
+  }
+
+  stepper("c1p", [
+    { t: "[Primeiro passo]", e: "[O que acontece neste passo, em linguagem simples.]", acende: ["c1-n1"] },
+    { t: "[Segundo passo]", e: "[Explicação.]", acende: ["c1-n2", "c1-n3"] },
+    { t: "[Chegada]", e: "<b>[Conclusão do passo a passo.]</b>", acende: ["c1-n5"] }
+  ]);
+
+  /* quiz: r é a resposta certa (s, i ou x); fb explica com a fonte */
+  var QUIZ = [
+    { origem: "[De onde veio: execução, ato, condição]", t: "[Resultado esperado tirado da saída real]", r: "x", fb: "<b>Inventado.</b> [Por quê, citando o documento-fonte.]" },
+    { origem: "[Origem]", t: "[Item]", r: "s", fb: "<b>Sustentado:</b> [trecho que confere.]" }
+  ];
+  $("quiz").innerHTML = QUIZ.map(function (q, i) {
+    return '<div class="quiz-q" data-i="' + i + '"><span class="origem">' + q.origem + '</span><span class="enun">' + q.t + '</span><div class="opts">' +
+      '<button type="button" class="op" data-r="s">Sustentado</button><button type="button" class="op" data-r="i">Inferido</button><button type="button" class="op" data-r="x">Inventado</button>' +
+      '</div><p class="fb" aria-live="polite"></p></div>';
+  }).join("");
+  $("quiz").addEventListener("click", function (e) {
+    var b = e.target.closest(".op"); if (!b) return;
+    var box = b.closest(".quiz-q"), q = QUIZ[Number(box.getAttribute("data-i"))];
+    box.querySelectorAll(".op").forEach(function (o) { o.classList.remove("certo", "errado"); });
+    var certo = b.getAttribute("data-r") === q.r;
+    b.classList.add(certo ? "certo" : "errado");
+    if (!certo) box.querySelector('.op[data-r="' + q.r + '"]').classList.add("certo");
+    box.querySelector(".fb").innerHTML = (certo ? "Isso. " : "Não exatamente. ") + q.fb;
+  });
+
+  /* demonstração: o pedido mostrado é exatamente o que foi enviado nas execuções registradas e o que vai ao vivo */
+  var PEDIDO_A1 = "[Pedido exato do Ato 1]";
+  stepper("a1", [
+    { t: "[A condição]", e: "[O que está e o que não está na janela. Peça uma previsão à turma.]" },
+    { t: "O pedido", e: "[Como o pedido foi enviado.]", c: function () { return caixaPedido("Pedido", PEDIDO_A1); } },
+    { t: "Execução A", e: "[O que reparar nesta saída.]", c: function () { return caixaSaida("Registrada · execução A", "[modelo] · [data] · texto sem edição", md(texto("txt-a1"))); } },
+    { t: "Comparar com a fonte", e: "[A régua: o documento-fonte.]", c: function () {
+      return '<div class="rolagem"><table class="tabela"><thead><tr><th>Tema</th><th>Fonte</th><th>Execução</th><th>Leitura</th></tr></thead><tbody>' +
+        '<tr><td><b>[Tema]</b></td><td>[o que a fonte diz]</td><td>[o que a saída disse]</td><td><span class="tag x">inventado</span> [leitura]</td></tr>' +
+        "</tbody></table></div>";
+    } }
+  ]);
+  $("a1-rodar").addEventListener("click", function () { rodar(PEDIDO_A1, $("a1-vivo"), $("a1-aviso"), $("a1-rodar")); });
+})();
+</script>
+<!-- publicar:fim -->
+</body></html>

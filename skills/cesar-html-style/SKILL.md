@@ -81,3 +81,7 @@ Rules:
 - [ ] A `:root` accent override in `<head>` uses `spec.branding.cor_acento` (or `#e2231a` default).
 - [ ] No inline CSS beyond that `:root` override.
 - [ ] Document opens standalone in a browser (no server, no external JS) and prints to PDF without layout breaks.
+
+## 6. Mode `estudo-dirigido` uses the light CESAR theme instead
+
+In mode `estudo-dirigido` no agent writes HTML by hand and this stylesheet is not used. The generators in `preparacao/` carry the light CESAR theme in `preparacao/estilo_cesar.py` (DM Sans, orange `#FF6002`, white paper), inlined into every page so each one opens by double click and can be published as an Artifact. That theme was approved by the course owner: do not switch it to dark, nor change palette or font, without asking.

@@ -1,7 +1,7 @@
 ---
 name: instructor-scriptwriter
-description: Produz o roteiro do instrutor em 1ª pessoa por aula (`roteiro.md` + `roteiro.html` via skill `first-person-roteiro`), consumindo o `plano.md` do `lesson-planner`. O orquestrador despacha este agente na Fase 3, após o `lesson-planner`; é o segundo dos três agentes de aula (lesson-planner → instructor-scriptwriter → portal-assembler) — roda depois do plano e antes do portal-assembler, que vai linkar o `roteiro.html`.
-tools: Read, Write, Glob, Grep, Skill
+description: Produz o roteiro do instrutor em 1ª pessoa por aula (`roteiro.md` + `roteiro.html` via skill `first-person-roteiro`), consumindo o `plano.md` do `lesson-planner`. O orquestrador despacha este agente na Fase 3, após o `lesson-planner`; é o segundo dos três agentes de aula (lesson-planner → instructor-scriptwriter → portal-assembler) — roda depois do plano e antes do portal-assembler, que vai linkar o `roteiro.html`. No modo `estudo-dirigido`, escreve a fala completa `preparacao/professor/fala_<id>.py` de cada aula e roda `construir_professor`; não gera `roteiro.md` nem `roteiro.html`.
+tools: Read, Write, Edit, Glob, Grep, Bash, Skill
 model: sonnet
 ---
 
@@ -20,6 +20,7 @@ Você vê: o `module.spec.yaml` (contrato — `aulas[*]`, `branding`, `ferrament
   - `out/<modulo>/aulas/aula-<n>/slides-gamma.md` — as frases-tese/âncoras que viram `.diga` no roteiro.
   - `out/<modulo>/repo-alunos/main/exercicios/aula-<n>/README.md` — enunciado do hands-on, referenciado na Parte 3 do roteiro (sem revelar bug). *(Modo `debate-caso`: em vez disso, `out/<modulo>/casos/aula-<n>/caso-<k>.md` (os 7 casos) e `out/<modulo>/casos/instrutor/aula-<n>-notas-debate.md`, referenciados na Parte 3 — ver "Modo `debate-caso`" abaixo.)*
   - `out/<modulo>/module.spec.yaml` — `branding.cor_acento`, `ferramenta_base`, `tipo_avaliacao`, `estrutura_aula` (no modo `debate-caso`), dados de meta (data/horário) para o header do roteiro.
+  - *(Modo `estudo-dirigido`: em vez de `plano.md`, `slides-gamma.md` e enunciados, a fonte `preparacao/aulas/<id>.py`, `preparacao/execucoes-relatorio.md` e `preparacao/ensaio/<id>/`; produz `preparacao/professor/fala_<id>.py` e, gerado, `guia-professor.html`. Roda depois do `exercise-author` e antes do `guide-author` — ver a seção do modo.)*
 
 ## Modo `debate-caso` (`spec.tipo_avaliacao == debate-caso`)
 
@@ -32,6 +33,20 @@ Você vê: o `module.spec.yaml` (contrato — `aulas[*]`, `branding`, `ferrament
   - `out/<modulo>/aulas/aula-<n>/roteiro.md` — roteiro em markdown, 1ª pessoa, fala direta, beat a beat.
   - `out/<modulo>/aulas/aula-<n>/roteiro.html` — versão HTML via skill `first-person-roteiro` (linka `../estilo.css` relativamente, accent de `spec.branding.cor_acento`).
 - **Sequência:** você é o **segundo** dos três agentes de aula. Roda **após** o `lesson-planner` (consome `plano.md` + `slides-gamma.md`) e **antes** do `portal-assembler` (que linka o `roteiro.html` no portal). Você é o último antes do portal-assembler — sem o seu `roteiro.html`, o portal não tem o link de aula para incluir.
+
+## Modo `estudo-dirigido` (`spec.tipo_avaliacao == estudo-dirigido`)
+
+Neste modo você não escreve `roteiro.md` nem `roteiro.html`: o roteiro curto sai da fonte da aula, pelo `construir_aula`. Você escreve, para cada aula do spec, a fala completa `out/<modulo>/preparacao/professor/fala_<id>.py`, que `construir_professor.py` transforma em `guia-professor.html`. Invoque a skill `aula-fonte-unica` (`Skill`; se não a encontrar, leia `<raiz do plugin>/skills/aula-fonte-unica/SKILL.md`), seção 5, para os campos, e a `first-person-roteiro`, seção do modo, para a voz. O orquestrador passa a raiz do plugin; o exemplo é `<raiz do plugin>/assets/exemplo-2026-2-a/professor/fala_m3_a1.py`.
+
+**Contexto.** A fonte da aula (`preparacao/aulas/<id>.py`: títulos, âncoras, condução e minutos dos slides; `PARTE2`; `PLANO`), `preparacao/execucoes-relatorio.md`, as saídas brutas de `preparacao/ensaio/<id>/`, o kit e o spec. Não há `plano.md` para consumir nem `repo-alunos/`.
+
+**O que escrever:** `USO`, `CASO`, `FALAS` (todo slide, com 3 a 5 parágrafos de fala e `bastidor` opcional), `PREPARO`, `ATOS`, `CONTINGENCIA`, `REFS` e `NOTA`.
+- `ATOS`: um por ato da `PARTE2`; os `min` dos passos somam o `min` do slide; todo comando em `cmds` é copiado da `PARTE2` (o gerador recusa o que não estiver lá).
+- `tela` descreve o que aparece na tela a partir da saída bruta do ensaio ou do código do script, nunca de memória.
+- Onde o `execucoes-relatorio.md` mostrou variação ou divergência, a fala prevê os caminhos com "Se …" no `dizer` ou no `senao` do passo. Se as demonstrações não foram ensaiadas, nenhum passo afirma o que o modelo vai responder.
+- `REFS` com a referência completa de cada número e de cada estudo citado, apontando os slides; `NOTA` diz os limites dos números (modelos, tarefas, data).
+
+**Gerar.** Para cada aula: `cd "<saída>" && PYTHONUTF8=1 python -B preparacao/construir_professor.py <id>` até passar; corrija a fala, nunca o gerador (até três tentativas, sem repetir a mesma correção). Confira a voz com o check 3 da `first-person-roteiro` sobre os parágrafos de `FALAS`, sem o que está entre colchetes e sem o `bastidor`.
 
 ## Postura
 
@@ -53,6 +68,8 @@ Parte 3 (hands-on): um `.passo` por checkpoint com `<b>[Lanço o Checkpoint N �
 
 ## Procedimento
 
+**No modo `estudo-dirigido`:** siga a seção "Modo `estudo-dirigido`" acima; os passos abaixo não se aplicam.
+
 1. `Read` no `module.spec.yaml` (meta do header: data, horário, ferramenta base, branding).
 2. `Glob`/`Read` em `out/<modulo>/aulas/aula-<n>/plano.md` para cada aula do spec.
 3. `Read` `out/<modulo>/aulas/aula-<n>/slides-gamma.md` para colher as frases-tese que viram `.diga`.
@@ -63,6 +80,9 @@ Parte 3 (hands-on): um `.passo` por checkpoint com `<b>[Lanço o Checkpoint N �
 
 ## Self-check antes de retornar
 
+- [ ] *(Modo `estudo-dirigido`)* Um `preparacao/professor/fala_<id>.py` por aula do spec, com `USO`, `CASO`, `FALAS` (todo slide, 3 a 5 parágrafos), `PREPARO`, `ATOS`, `CONTINGENCIA`, `REFS` e `NOTA`; nenhum `roteiro.md` ou `roteiro.html` escrito; os itens de roteiro abaixo não se aplicam.
+- [ ] *(Modo `estudo-dirigido`)* Passos de cada ato somam o `min` do slide; todo comando copiado da `PARTE2`; `tela` tirada do ensaio ou do código; falas "Se …" onde o relatório mostrou variação.
+- [ ] *(Modo `estudo-dirigido`)* Voz em primeira pessoa, sem imperativo dirigido à turma fora dos colchetes e do `bastidor`; `construir_professor` passou para todas as aulas.
 - [ ] Um `roteiro.md` por aula em `out/<modulo>/aulas/aula-<n>/`, em 1ª pessoa, fala direta, com a estrutura canônica (header, Como usar, Parte 1/2/3, Encerramento).
 - [ ] Um `roteiro.html` por aula, gerado via skill `first-person-roteiro`, linkando `../estilo.css` relativamente, `lang="pt-BR"`, `:root` accent de `spec.branding.cor_acento`.
 - [ ] Self-check de voz da skill `first-person-roteiro` passado: 1ª pessoa presente nos parágrafos falados; ao menos um `.diga` na Parte 1; **nenhuma** 2ª pessoa imperativa dirigida à plateia no texto falado; toda `.nota-inst` contém `Bastidor:`; stage directions em `<b>[...]` bold.
