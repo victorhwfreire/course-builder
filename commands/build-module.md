@@ -51,15 +51,29 @@ Report: trend-researcher skipped or produced `tendencias.md`; ementa-architect p
 
 ---
 
-## Phase 2 — repo dos alunos
+## Phase 2 — repo dos alunos / kit de projeto
 
-Dispatch in this exact order (sequencing per each agent's handoff notes):
+**Branch on `spec.tipo_avaliacao`** (default `repo-bugs` when the field is absent). The three modes are mutually exclusive; dispatch only the branch that matches.
+
+### Mode `repo-bugs` (default) — dispatch in this exact order (sequencing per each agent's handoff notes):
 
 8. **`repo-scaffolder`** — scaffolds `out/<modulo>/repo-alunos/main/` + `out/<modulo>/repo-alunos/gabaritos/README.md`. Pass spec path + output dir.
 9. **`bug-smith`** — plants verified, reproducible bugs in `main/`, writes correct versions in `gabaritos/`, registers each in `gabaritos/bug-manifest.md` with the `ferramenta_base.versao` version-pin header, writes repro tests in `main/testes/`. Pass spec path + output dir.
 10. **`exercise-author`** — writes student-facing enunciados in `main/exercicios/aula-<n>/` (referencing bugs indirectly, never leaking gabaritos) and `gabaritos/rubricas.md` (instrutor-facing, not an autograder). Pass spec path + output dir.
 
-Report per dispatch: artifact(s) produced + any flags (e.g. `não-verificado` bugs in the manifest).
+### Mode `projeto-pitch` — dispatch in this order, **SKIPPING `bug-smith`**:
+
+8. **`repo-scaffolder`** (projeto-pitch mode) — scaffolds `out/<modulo>/repo-alunos/projeto/` (README brief + `templates/` + `dados/` + `entregaveis/`, all placeholders) and `out/<modulo>/repo-alunos/instrutor/README.md` (instructor-only). No `main/`/`gabaritos/` bug tree. Pass spec path + output dir.
+9. **`bug-smith` — SKIP.** Do **not** dispatch it: `projeto-pitch` has no planted bugs (bug-smith has a mode guard that no-ops if dispatched by mistake). Report one line: "bug-smith pulado: tipo_avaliacao=projeto-pitch".
+10. **`exercise-author`** (projeto-pitch mode) — fills `projeto/README.md` (the real project brief from `spec.projeto` + ementa), the three `projeto/templates/` files, and `instrutor/rubricas.md` (instrutor-facing rubric from `spec.projeto.rubrica`, weights sum 100%). Pass spec path + output dir.
+
+### Mode `debate-caso` — dispatch only `exercise-author`, **SKIPPING both `repo-scaffolder` and `bug-smith`**:
+
+8. **`repo-scaffolder` — SKIP.** Do **not** dispatch it: `debate-caso` has no student repo (repo-scaffolder has a mode guard that no-ops if dispatched by mistake). Report one line: "repo-scaffolder pulado: tipo_avaliacao=debate-caso".
+9. **`bug-smith` — SKIP.** Do **not** dispatch it, same reasoning. Report one line: "bug-smith pulado: tipo_avaliacao=debate-caso".
+10. **`exercise-author`** (debate-caso mode) — writes `out/<modulo>/casos/aula-<n>/caso-<k>.md` (exactly 7 per aula, student-facing, from `spec.aulas[n].casos_debate`) and `out/<modulo>/casos/instrutor/aula-<n>-notas-debate.md` (instructor-facing debate notes). Pass spec path + output dir. It is the **only** Phase-2 agent dispatched in this mode.
+
+Report per dispatch: artifact(s) produced + any flags (e.g. `não-verificado` bugs in the manifest for `repo-bugs`; skipped bug-smith for `projeto-pitch`; skipped repo-scaffolder + bug-smith for `debate-caso`).
 
 ---
 
@@ -77,7 +91,7 @@ Report per dispatch: artifact(s) produced; note any re-dispatch.
 
 ## Phase 4 — QA  (Gate HITL #2)
 
-14. **Dispatch `qa-reviewer`** with the spec path + output dir + **baseline path** (only if the human supplied one). If no baseline was given, dispatch `qa-reviewer` without one — it skips drift-vs-baseline and records a note. `qa-reviewer` re-verifies planted bugs against the pinned `ferramenta_base.versao`, measures drift vs the baseline when provided (dogfood-as-eval: drift from a known-good baseline = a **plugin regression**, not just a module difference), runs coherence checks, and produces `out/<modulo>/qa-report.md` with a verdict (SHIPPABLE / NÃO-SHIPPABLE / SHIPPABLE-COM-RESERVAS) and findings by severity.
+14. **Dispatch `qa-reviewer`** with the spec path + output dir + **baseline path** (only if the human supplied one). If no baseline was given, dispatch `qa-reviewer` without one — it skips drift-vs-baseline and records a note. In mode `repo-bugs`, `qa-reviewer` re-verifies planted bugs against the pinned `ferramenta_base.versao`; in mode `projeto-pitch` it skips bug re-verification (no bugs) and instead checks project-kit coherence (rubric weights sum 100%, brief traces to `spec.projeto`, `instrutor/` not leaked); in mode `debate-caso` it skips bug re-verification and instead checks the debate-block coherence (exactly 7 `caso-<k>.md` per aula with no leaked analysis, instructor debate notes complete, `estrutura_aula.blocos` minutes summing to `duracao_min`, and `slide_max` — if set — respected by every `slides-gamma.md`). It measures drift vs the baseline when provided (dogfood-as-eval: drift from a known-good baseline = a **plugin regression**, not just a module difference), runs coherence checks, and produces `out/<modulo>/qa-report.md` with a verdict (SHIPPABLE / NÃO-SHIPPABLE / SHIPPABLE-COM-RESERVAS) and findings by severity.
 15. **Gate HITL #2 (hard pause):** after `qa-reviewer` returns, **STOP**. Surface `qa-report.md` to the human — the verdict, the blocker/warning/note counts, and the drift section. **Do NOT auto-ship.** Do NOT declare the module shipped. Do NOT commit. Per `spec.filosofia.hitl_so_grave`, shipping a wrong module to students is a **grave and irreversible** path — HITL is justified here even though the rest of the pipeline is automated. The module is only "shipped" once a human reads the report and gives explicit greenlight.
 
 Report: `qa-report.md` produced; verdict + counts surfaced; orchestrator paused for human greenlight.
@@ -109,7 +123,7 @@ This dogfoods the plugin: the example spec recreates Module 3 of "IA para Devs" 
 |-------|------------------|------|
 | 0 — spec-parse | (no agent; orchestrator validates) | **HITL #1** — stop on invalid spec |
 | 1 — ementa | `trend-researcher` (if `pesquisar_tendencias: true`) → `ementa-architect` | piloto v1 check |
-| 2 — repo | `repo-scaffolder` → `bug-smith` → `exercise-author` | — |
+| 2 — repo/projeto/casos | `repo-bugs`: `repo-scaffolder` → `bug-smith` → `exercise-author` · `projeto-pitch`: `repo-scaffolder` → ~~`bug-smith`~~ (skip) → `exercise-author` · `debate-caso`: ~~`repo-scaffolder`~~ (skip) → ~~`bug-smith`~~ (skip) → `exercise-author` | — |
 | 3 — aulas | `lesson-planner` → `instructor-scriptwriter` → `portal-assembler` (re-dispatch on missing dep) | — |
 | 4 — QA | `qa-reviewer` (with baseline path) | **HITL #2** — pause for human greenlight |
 

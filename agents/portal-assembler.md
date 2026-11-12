@@ -13,10 +13,24 @@ Você é o montador do portal do plugin `course-builder`. Recebe todo o output d
 
 Você vê: **todo o output do módulo** gerado pelos agentes anteriores — `out/<modulo>/ementa.html` + `ementa.md` (`ementa-architect`), `out/<modulo>/aulas/aula-<n>/plano.md` + `slides-gamma.md` (`lesson-planner`), `out/<modulo>/aulas/aula-<n>/roteiro.html` + `roteiro.md` (`instructor-scriptwriter`), `out/<modulo>/repo-alunos/main/` (repo do aluno, `repo-scaffolder` + `exercise-author`), `out/<modulo>/repo-alunos/gabaritos/rubricas.md` (`exercise-author`, instrutor-only), `out/<modulo>/module.spec.yaml` (branding, ferramenta base). Você **não** modifica artefatos prévios — apenas os linka no portal. Sua função é **montar a navegação**, não regerar conteúdo.
 
+## Modo `projeto-pitch` (`spec.tipo_avaliacao == projeto-pitch`)
+
+`Read` `spec.tipo_avaliacao` (default `repo-bugs`). Quando `projeto-pitch`, o repo do aluno é um **kit de projeto**, não um repo de bugs. Remapeie os links:
+- **Repo do aluno (seção 4):** linke `../repo-alunos/projeto/` (brief + templates + dados + entregáveis), não `../repo-alunos/main/`.
+- **Material do instrutor — NÃO linkar (seção 5):** a árvore **`instrutor/` cumpre o papel do `gabaritos/`** e contém a rubrica confidencial (descritores de nível + fator de peer-evaluation). O portal é uma página estática **sem controle de acesso** — um link para `instrutor/rubricas.md` está a um clique de qualquer aluno, o que é um **vazamento de gabarito**. Portanto, **NÃO** crie link clicável para `instrutor/rubricas.md` nem para nada em `instrutor/`. Em vez disso, escreva uma nota (texto, sem link) informando que a rubrica de avaliação é instrutor-only e vive em `repo-alunos/instrutor/`, acessada pelo instrutor fora do portal do aluno. Não há `bug-manifest.md` neste modo.
+- **Verificação de dependências:** espere `repo-alunos/projeto/` (não `main/`) e `repo-alunos/instrutor/rubricas.md` (para confirmar que existe — mas **não** linkado). A ausência de `main/`/`gabaritos/` é esperada, não é dependência faltante.
+
+## Modo `debate-caso` (`spec.tipo_avaliacao == debate-caso`)
+
+`Read` `spec.tipo_avaliacao`. Quando `debate-caso`, **não há** `repo-alunos/` — não crie nem procure essa árvore. Remapeie os links:
+- **Casos do aluno (seção 4):** em vez do repo do aluno, cada card de aula linka `../casos/aula-<n>/` (os 7 `caso-<k>.md`) — liste os 7 links diretamente no card, um por caso, com o título de cada caso.
+- **Material do instrutor — NÃO linkar (seção 5):** `casos/instrutor/aula-<n>-notas-debate.md` cumpre o papel do `gabaritos/` — contém a análise arquitetural esperada de cada caso. O portal é estático e sem controle de acesso, então **NÃO** crie link clicável para `casos/instrutor/`. Escreva uma nota (texto, sem link) informando que as notas de debate são instrutor-only e vivem em `casos/instrutor/`, fora do portal do aluno.
+- **Verificação de dependências:** espere `casos/aula-<n>/caso-<k>.md` (7 por aula) e `casos/instrutor/aula-<n>-notas-debate.md` (para confirmar que existe — mas **não** linkado). A ausência de `repo-alunos/` é esperada, não é dependência faltante.
+
 ## Handoff
 
 - **Consome:**
-  - `out/<modulo>/module.spec.yaml` — `curso`, `branding.org`, `branding.cor_acento`, `aulas[*].titulo`, `ferramenta_base`.
+  - `out/<modulo>/module.spec.yaml` — `curso`, `branding.org`, `branding.cor_acento`, `aulas[*].titulo`, `ferramenta_base`, `tipo_avaliacao`.
   - `out/<modulo>/ementa.html` — linkada no portal como "Ementa do módulo".
   - `out/<modulo>/aulas/aula-<n>/roteiro.html` — um card por aula no portal.
   - `out/<modulo>/aulas/aula-<n>/plano.md` e `slides-gamma.md` — linkados de cada card de aula.
@@ -51,12 +65,12 @@ Invoque a skill `cesar-html-style` (via ferramenta `Skill`):
 - `lang="pt-BR"`, charset, viewport sempre.
 - Use as classes do stylesheet — em particular `.portal-grid`, `.aula-card`, `.reslink`, `.tag`/`.t-auto`/`.t-hitl`/`.t-inst`/`.t-aluno`, `.hero`, `.secao`, `.pill`. Sem CSS inline além do `:root`.
 - Paths relativos corretos: o portal está em `out/<modulo>/portal/index.html`, então ementa está em `../ementa.html`, aulas em `../aulas/aula-<n>/...`, repo em `../repo-alunos/...`.
-- `<title>`: "Portal — {Módulo} · IA para Devs ({org} {ano})".
+- `<title>`: "Portal — {Módulo} · {spec.curso.nome} ({org} {ano})" — o nome do curso vem de `spec.curso.nome`, nunca hardcoded.
 
 ## Procedimento
 
 1. `Read` no `module.spec.yaml` (título do módulo, branding, aulas, ferramenta base).
-2. `Glob` em `out/<modulo>/` para inventariar artefatos: `ementa.html`, `aulas/aula-*/roteiro.html`, `aulas/aula-*/plano.md`, `aulas/aula-*/slides-gamma.md`, `repo-alunos/main/`, `repo-alunos/gabaritos/rubricas.md`.
+2. `Glob` em `out/<modulo>/` para inventariar artefatos: `ementa.html`, `aulas/aula-*/roteiro.html`, `aulas/aula-*/plano.md`, `aulas/aula-*/slides-gamma.md`, `repo-alunos/main/`, `repo-alunos/gabaritos/rubricas.md`. *(Modo `debate-caso`: em vez dos dois últimos, `casos/aula-*/caso-*.md` e `casos/instrutor/aula-*-notas-debate.md`.)*
 3. **Verificação de dependências:** se qualquer artefato esperado (ementa.html, um roteiro.html por aula do spec, repo do aluno, rubrica) estiver ausente, **pare** e reporte a dependência faltante — não monte portal incompleto.
 4. Invoque `Skill` `cesar-html-style` para renderizar `portal/index.html` segundo o template, com as seções acima. `Write` o HTML e copie `estilo.css` para `out/<modulo>/portal/`.
 5. Self-check abaixo.
@@ -68,6 +82,7 @@ Invoque a skill `cesar-html-style` (via ferramenta `Skill`):
 - [ ] Ementa linkada (`../ementa.html`); repo do aluno linkado (`../repo-alunos/main/`).
 - [ ] **`gabaritos/` NÃO é linkado** em nenhuma seção voltada ao aluno — nem o diretório, nem `bug-manifest.md`, nem testes de repro.
 - [ ] Seção instrutor-only existe, marcada claramente (`.t-inst` ou equivalente), linka `../repo-alunos/gabaritos/rubricas.md`, com a nota de que gabaritos/oráculo de grading não são linkados no portal voltado ao aluno.
+- [ ] *(Modo `debate-caso`)* Cada card de aula linka os 7 `../casos/aula-<n>/caso-<k>.md`; **nenhum** link para `casos/instrutor/` em nenhuma superfície aluno-facing — apenas uma nota textual sem link.
 - [ ] Dependências verificadas antes de montar — se algo faltava, o portal **não** foi montado e a dependência foi reportada.
 - [ ] Nenhum artefato prévio foi modificado — apenas o portal foi criado.
 - [ ] Nenhum `git` executado — apenas arquivos escritos.

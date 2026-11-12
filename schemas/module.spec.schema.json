@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://course-builder.local/schemas/module.spec.schema.json",
   "title": "Course Module Spec",
-  "description": "Input spec consumed by the /build-module command of the course-builder plugin. Describes one course module and drives the 9 subagents + 2 skills + 2 hooks that produce the artifact bundle.",
+  "description": "Input spec consumed by the /build-module command of the course-builder plugin. Describes one course module and drives the 9 subagents + 2 skills + 2 hooks that produce the artifact bundle. The `tipo_avaliacao` field selects the module's assessment model: 'repo-bugs' (default) drives a planted-bug coding repo; 'projeto-pitch' drives a group proposal + pitch project (Phase-2 produces a project kit and bug-smith is skipped); 'debate-caso' drives a per-lesson 4-block structure (teoria -> exemplos_basicos -> desafio_real -> debate_grupo) with 7 architectural case scenarios debated in groups per lesson — Phase 2 (repo-scaffolder and bug-smith) is skipped entirely and exercise-author writes case briefs + instructor debate notes directly under aulas/.",
   "type": "object",
   "additionalProperties": false,
   "required": ["curso", "publico_alvo", "aulas"],
@@ -62,6 +62,50 @@
             "type": "integer",
             "description": "Optional lesson duration in minutes. Omit if the module default applies.",
             "minimum": 1
+          },
+          "casos_debate": {
+            "type": "array",
+            "description": "Exactly 7 architectural debate case scenarios for this lesson's group-discussion block (tipo_avaliacao=debate-caso). Each scenario is assigned to one group. Drives exercise-author's student-facing case briefs and instructor-facing debate notes.",
+            "minItems": 7,
+            "maxItems": 7,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "titulo", "contexto", "pergunta_arquitetural", "opcoes"],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Stable case identifier (e.g. 'CASO-1').",
+                  "minLength": 1
+                },
+                "titulo": {
+                  "type": "string",
+                  "description": "Short case title.",
+                  "minLength": 1
+                },
+                "contexto": {
+                  "type": "string",
+                  "description": "The real-world scenario the group must analyze (system, constraints, stakeholders).",
+                  "minLength": 1
+                },
+                "pergunta_arquitetural": {
+                  "type": "string",
+                  "description": "The architectural decision the group must argue for and justify (e.g. 'workflow determinístico ou agente autônomo para este fluxo, e por quê?').",
+                  "minLength": 1
+                },
+                "opcoes": {
+                  "type": "array",
+                  "description": "The architectural options on the table (e.g. ['workflow determinístico', 'agente autônomo', 'híbrido com HITL']).",
+                  "minItems": 2,
+                  "items": { "type": "string", "minLength": 1 }
+                },
+                "tensao_central": {
+                  "type": "string",
+                  "description": "The core tradeoff driving the decision (custo, latência, controlabilidade, previsibilidade da tarefa, auditabilidade, etc.).",
+                  "minLength": 1
+                }
+              }
+            }
           }
         }
       }
@@ -123,6 +167,133 @@
       "type": "boolean",
       "description": "Whether the trend-researcher subagent runs. Defaults to true. Set false to skip web research (e.g. offline runs, rate-limited environment).",
       "default": true
+    },
+    "slide_max": {
+      "type": "integer",
+      "description": "Optional hard cap on slides per aula. When present, lesson-planner's Gamma prompt must not exceed it and qa-reviewer flags violations. When absent, lesson-planner falls back to its own time-budget heuristic (which can run to 35-45 slides for a 180min repo-bugs lecture).",
+      "minimum": 1
+    },
+    "estrutura_aula": {
+      "type": "object",
+      "description": "Fixed 4-block in-class pedagogical template — teoria -> exemplos_basicos -> desafio_real -> debate_grupo — applied uniformly to every aula. Required when tipo_avaliacao=debate-caso; ignored otherwise.",
+      "additionalProperties": false,
+      "required": ["blocos"],
+      "properties": {
+        "blocos": {
+          "type": "object",
+          "description": "Minute budget per block. Should sum to each aula's duracao_min (checked by qa-reviewer, not by this schema).",
+          "additionalProperties": false,
+          "required": ["teoria_min", "exemplos_basicos_min", "desafio_real_min", "debate_grupo_min"],
+          "properties": {
+            "teoria_min": {
+              "type": "integer",
+              "description": "Minutes for the formal-concepts block, framed for architectural decision-making.",
+              "minimum": 1
+            },
+            "exemplos_basicos_min": {
+              "type": "integer",
+              "description": "Minutes for basic worked examples illustrating the theory.",
+              "minimum": 1
+            },
+            "desafio_real_min": {
+              "type": "integer",
+              "description": "Minutes for the instructor-led walkthrough of a real architectural challenge.",
+              "minimum": 1
+            },
+            "debate_grupo_min": {
+              "type": "integer",
+              "description": "Minutes for the 7-scenario group debate plus plenary synthesis.",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "tipo_avaliacao": {
+      "type": "string",
+      "description": "Assessment model for this module, selecting the Phase-2 behavior. 'repo-bugs' (default): students fix verified planted bugs in a coding repo — Phase 2 runs repo-scaffolder -> bug-smith -> exercise-author, and qa-reviewer re-verifies the bugs. 'projeto-pitch': students deliver an executive proposal + pitch for a real problem — Phase 2 runs repo-scaffolder (project-kit mode) -> exercise-author (project-brief mode), bug-smith is SKIPPED, and qa-reviewer verifies project-kit coherence instead of planted bugs. When 'projeto-pitch', the `projeto` block is required and `ferramenta_base` is not needed. 'debate-caso': every aula follows the 4-block teoria/exemplos_basicos/desafio_real/debate_grupo structure and closes with 7 architectural case scenarios debated in groups — Phase 2 is skipped entirely (no repo-scaffolder, no bug-smith); exercise-author writes case briefs + instructor debate notes directly under aulas/aula-<n>/casos/. When 'debate-caso', `estrutura_aula` is required and every aula must have `casos_debate` with exactly 7 entries.",
+      "enum": ["repo-bugs", "projeto-pitch", "debate-caso"],
+      "default": "repo-bugs"
+    },
+    "projeto": {
+      "type": "object",
+      "description": "Final group-project definition. Consumed by the Phase-2 agents when tipo_avaliacao='projeto-pitch' (required in that mode). Ignored for 'repo-bugs'.",
+      "additionalProperties": false,
+      "required": ["formato", "entregaveis"],
+      "properties": {
+        "formato": {
+          "type": "string",
+          "description": "Deliverable format in one phrase (e.g. 'Proposta executiva + pitch em vídeo').",
+          "minLength": 1
+        },
+        "descricao": {
+          "type": "string",
+          "description": "Short statement of the project task the group must accomplish.",
+          "minLength": 1
+        },
+        "entregaveis": {
+          "type": "array",
+          "description": "Concrete deliverables the group submits (e.g. deck, pitch video, peer-evaluation form). Non-empty.",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "duracao_assincrona_h": {
+          "type": "number",
+          "description": "Asynchronous workload budget for the project, in hours.",
+          "minimum": 0
+        },
+        "marcos": {
+          "type": "array",
+          "description": "Scaffolded checkpoints across the module (kickoff, mid-points, final mentoring).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["nome", "aula"],
+            "properties": {
+              "nome": { "type": "string", "minLength": 1 },
+              "aula": { "type": "integer", "description": "1-based lesson number where this milestone happens.", "minimum": 1 },
+              "descricao": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "rubrica": {
+          "type": "array",
+          "description": "Instructor-facing grading criteria with weights. Weights should sum to 100.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["criterio", "peso_pct"],
+            "properties": {
+              "criterio": { "type": "string", "minLength": 1 },
+              "peso_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+              "descricao": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "tipo_avaliacao": { "const": "projeto-pitch" } },
+        "required": ["tipo_avaliacao"]
+      },
+      "then": { "required": ["projeto"] }
+    },
+    {
+      "if": {
+        "properties": { "tipo_avaliacao": { "const": "debate-caso" } },
+        "required": ["tipo_avaliacao"]
+      },
+      "then": {
+        "required": ["estrutura_aula"],
+        "properties": {
+          "aulas": {
+            "items": { "required": ["casos_debate"] }
+          }
+        }
+      }
+    }
+  ]
 }
